@@ -12,7 +12,7 @@
 //--------------------------------------------------- Interfaces utilisées
 
 //------------------------------------------------------------- Constantes
-const int TAILLE_MAX_BASE = 4;
+const int TAILLE_MAX_BASE = 5;
 
 //------------------------------------------------------------------ Types
 
@@ -114,6 +114,7 @@ void Vecteur<T>::insererFin(T objet)
 	if (tailleActuelle >= tailleMax)
 	{
 		tailleMax *= 2;
+		cout << "Taille max : " << tailleMax << endl;
 		T* temp = new T[tailleMax];
 		for (int i = 0; i < tailleActuelle; i++)
 		{

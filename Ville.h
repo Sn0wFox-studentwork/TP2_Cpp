@@ -40,7 +40,7 @@ public:
 	void EmbouteillageJour( int d7 );
 	// Affiche le pourcentage de R et N pour chaque heure d'un jour de la semaine
 	
-	void TempsParcours( int hDebut, int hFin, int d7, Vecteur<int>& idSegments );
+	void TempsParcours( int d7, int hDebut, int hFin, Vecteur<int>& idSegments );
 	// Affiche l'heure de depart et le temps de parcours minimal pour parcourir idSegments entre tdebut et tfin au jour d7 de la semaine
 	// Passage par référence pour aller + vite
 	// TODO: heures de debut et de fin comprises ou pas ?
@@ -57,9 +57,11 @@ public:
     // Contrat :
     //
     
-    Capteur & operator[] ( int idCapteur );
-    //accès à un capteur
+    Capteur& operator[] ( int idCapteur );
+    // Accès à un capteur
 
+	Capteur& operator[] ( int idCapteur ) const;
+	// Accès à un capteur
 
 //-------------------------------------------- Constructeurs - destructeur
     Ville ( const Ville & unVille );
@@ -85,7 +87,7 @@ public:
 protected:
 //----------------------------------------------------- Méthodes protégées
 
-void CreerCapteur(int id);
+void CreerCapteur( int id );
 // Cree un capteur et l'insert dans le tableau des capteurs de la ville
 // Contrat :	on vérifie avant que ce capteur n'existe pas déjà
 

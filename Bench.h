@@ -37,7 +37,7 @@ void bench(retour(C::*pf)(param), C objet, param p, int repetitions)
 }
 
 template<class C, typename retour, typename param1, typename param2>
-void bench(retour(C::*pf)(param1, param2), C objet, param1 p1, param2 p2, int repetitions)
+void bench(retour(C::*pf)(param1, param2 &), C objet, param1 p1, param2 & p2, int repetitions)
 // Avec deux param
 {
 	clock_t debut = clock();
@@ -63,7 +63,7 @@ void bench(retour(C::*pf)(param1, param2, param3), C objet, param1 p1, param2 p2
 }
 
 template<class C, typename retour, typename param1, typename param2, typename param3, typename param4>
-void bench(retour(C::*pf)(param1, param2, param3, param4), C objet, param1 p1, param2 p2, param3 p3, param4 p4, int repetitions)
+void bench(retour(C::*pf)(param1, param2, param3, param4&), C& objet, param1 p1, param2 p2, param3 p3, param4& p4, int repetitions)
 // Avec quatre param
 {
 	clock_t debut = clock();

@@ -102,31 +102,28 @@ Vecteur<double> Capteur::StatsPropres()
 	Vecteur<double> statsRetour;
 	double total =	d1Resume[4] + d2Resume[4] + d3Resume[4] + d4Resume[4] +
 					d5Resume[4] + d6Resume[4] + d7Resume[4];
+	double statTrafic;
 
 	// Remplissage
-	if ( total != 0 )
+	for (int i = 0; i < TAILLE_RESUME - 1; i++)
 	{
-		statsRetour.insererFin( ( d1Resume[0] + d2Resume[0] + d3Resume[0]
-			+ d4Resume[0] + d5Resume[0] + d6Resume[0] + d7Resume[0]) / total );		// Lundi
-		statsRetour.insererFin( ( d1Resume[1] + d2Resume[1] + d3Resume[1]
-			+ d4Resume[1] + d5Resume[1] + d6Resume[1] + d7Resume[1]) / total );		// Mardi
-		statsRetour.insererFin( ( d1Resume[2] + d2Resume[2] + d3Resume[2]
-			+ d4Resume[2] + d5Resume[2] + d6Resume[2] + d7Resume[2]) / total );		// Mercredi
-		statsRetour.insererFin( ( d1Resume[3] + d2Resume[3] + d3Resume[3]
-			+ d4Resume[3] + d5Resume[3] + d6Resume[3] + d7Resume[3]) / total );		// Jeudi
-		statsRetour.insererFin( ( d1Resume[4] + d2Resume[4] + d3Resume[4]
-			+ d4Resume[4] + d5Resume[4] + d6Resume[4] + d7Resume[4]) / total );		// Vendredi
-		statsRetour.insererFin( ( d1Resume[5] + d2Resume[5] + d3Resume[5]
-			+ d4Resume[5] + d5Resume[5] + d6Resume[5] + d7Resume[5]) / total );		// Samedi
-		statsRetour.insererFin( ( d1Resume[6] + d2Resume[6] + d3Resume[6]
-			+ d4Resume[6] + d5Resume[6] + d6Resume[6] + d7Resume[6]) / total );		// Dimanche
+		if ( total != 0 )
+		{
+			statTrafic = ( d1Resume[i] + d2Resume[i] + d3Resume[i] + d4Resume[i] +
+				d5Resume[i] + d6Resume[i] + d7Resume[i] ) / total;			
+		}
+		else
+		{
+			statTrafic = 0;
+		}
+		statsRetour.insererFin(statTrafic);
 	}
-
+	
 	return statsRetour;
 
 } //----- Fin de StatsPropres
 
-Vecteur<double> Capteur::StatsJour(int d7)
+Vecteur<double> Capteur::StatsJour( int d7 )
 // Algorithme :
 {
 	// Création structure de retour et variables pratiques
@@ -264,7 +261,6 @@ Vecteur<int> Capteur::EmbouteillageJour( int d7 )
 	for ( int i = 0; i < 48; i++ )
 	{
 		donneesRetour.insererFin(0);
-		//total.insererFin(0);
 	}
 
 	// Parcours du tableau d'événements et remplissage de la structure de retour
@@ -275,17 +271,8 @@ Vecteur<int> Capteur::EmbouteillageJour( int d7 )
 		{
 			donneesRetour[(*jour)[i].GetHeure()] += 1;
 		}
-		donneesRetour[(*jour)[i].GetHeure() + 24] += 1;
-		//total[(*jour)[i].GetHeure()] += 1;				// TODO: plus rapide avec creation de variable ?
+		donneesRetour[(*jour)[i].GetHeure() + 24] += 1;		// TODO: plus rapide avec creation de variable ?
 	}
-
-	/*for (int i = 0; i < statsRetour.GetTaille(); i++)
-	{
-		if ( total[i] != 0 )
-		{
-			statsRetour[i] /= total[i];
-		}
-	}*/
 
 	return donneesRetour;
 

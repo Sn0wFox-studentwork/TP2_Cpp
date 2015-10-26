@@ -66,10 +66,10 @@ void Ville::StatsJour( int d7 )
 	}
 
 	// Affichage
-	for ( int i = 0; i < 4; i++ )
-	{
-		cout << statsRetour[i] * 100 << "%\r\n";	// TODO: quelle tronche a la fin de ligne ?
-	}
+	cout << "V " << statsRetour[0] * 100 << "%\r\n";	// TODO: quelle tronche a la fin de ligne ?
+	cout << "J " << statsRetour[1] * 100 << "%\r\n";
+	cout << "R " << statsRetour[2] * 100 << "%\r\n";
+	cout << "N " << statsRetour[3] * 100 << "%\r\n";
 
 } //----- Fin de statsJour
 
@@ -77,7 +77,7 @@ void Ville::EmbouteillageJour( int d7 )
 // Algorithme :
 {
 	// Création structure pour affichage et variables pratiques
-	Vecteur<int> stats;
+	Vecteur<double> stats;
 	Vecteur<int> total;
 	
 	// Init de la structure d'affichage
@@ -110,8 +110,9 @@ void Ville::EmbouteillageJour( int d7 )
 
 } //----- Fin de EmbouteillageJour
 
-void Ville::TempsParcours( int hDebut, int hFin, int d7, Vecteur<int>& idSegments )
+void Ville::TempsParcours( int d7, int hDebut, int hFin, Vecteur<int>& idSegments )
 // Algorithme :	TODO: complexite en n^4... A ameliorer sans doute
+// TODO: pour le moment , non-prise en compte du temps de déplacement ni des endroits sans données
 {
 	// Création variables pour affichage et variables pratiques
 	int temps;
@@ -125,7 +126,7 @@ void Ville::TempsParcours( int hDebut, int hFin, int d7, Vecteur<int>& idSegment
 
 	// Init variables
 	temps = 0;
-	meilleurTemps = 9999999;		// TODO : change this
+	meilleurTemps = 0;
 	meilleureHeure = 0;
 	meilleureMinute = 0;
 
@@ -147,26 +148,27 @@ void Ville::TempsParcours( int hDebut, int hFin, int d7, Vecteur<int>& idSegment
 	{
 		for ( int minute = 0; minute < 60; minute++ )
 		{
+			temps = 0;	// Remise à jour pour calcul du temps lors du départ à heure:minute
 			for (int i = 0; i < idSegments.GetTaille(); i++)
 			{
 				temps += capteursSegment[i]->TempsSegment(d7, heure, minute);
 			}
 			// En cas de nouveau meilleur temps : mise a jour
-			if (temps < meilleurTemps)
+			if ( (temps < meilleurTemps || meilleurTemps == 0) && temps > 0 )
 			{
 				meilleurTemps = temps;
 				meilleureHeure = heure;
 				meilleureMinute = minute;
 			}
 		}
-	}
+	} //----- Fin de for ( heure ) ; recherche du meilleur temps
 
 	// Affichage
-	cout << d7 << " " << meilleureHeure << " " << meilleureMinute << " " << meilleurTemps << "%\r\n";	// TODO: quelle tronche a la fin de ligne ?
+	cout << d7 << " " << meilleureHeure << " " << meilleureMinute << " " << meilleurTemps << "\r\n";	// TODO: quelle tronche a la fin de ligne ?
 
 } //----- Fin de TempsParcours
 
-void Ville::AjouterEvenement( int id, Evenement & evenement )
+void Ville::AjouterEvenement( int id, Evenement& evenement )
 // Algorithme :
 {
 	for (int i = 0; i < nombreCapteurs; i++)
@@ -201,8 +203,33 @@ Ville &Ville::operator = ( const Ville &uneVille )
 Capteur& Ville::operator[] ( int idCapteur )
 // Algorithme :
 {
-	return *capteurs[idCapteur];	// TODO: not sure du resultat
+	for (int i = 0; i < nombreCapteurs; i++)
+	{
+		if ( capteurs[i]->GetID() == idCapteur )
+		{
+			return *capteurs[i];
+		}
+	}
+	cout << "Error, attempted to access an inexistant element" << endl;
+	return *capteurs[0];	// Retour du premier élément pour que le programme ne plante pas
+
 } //----- Fin de operator []
+
+Capteur & Ville::operator[] ( int idCapteur ) const
+// Algorithme :
+{
+	for (int i = 0; i < nombreCapteurs; i++)
+	{
+		if (capteurs[i]->GetID() == idCapteur)
+		{
+			return *capteurs[i];
+		}
+	}
+	cout << "Error, attempted to access an inexistant element" << endl;
+	return *capteurs[0];	// Retour du premier élément pour que le programme ne plante pas
+
+} //----- Fin de operator [] const
+
 
 //-------------------------------------------- Constructeurs - destructeur
 Ville::Ville ( const Ville &uneVille )
