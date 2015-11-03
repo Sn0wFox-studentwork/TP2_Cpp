@@ -44,7 +44,6 @@ public:
 	// Affiche l'heure de depart et le temps de parcours minimal pour parcourir idSegments entre tdebut et tfin au jour d7 de la semaine
 	// Passage par référence pour aller + vite
 	// TODO: heures de debut et de fin comprises ou pas ?
-	// TODO: complexité à diminuer (n^4 ...)
 
 	void AjouterEvenement( int id, Evenement& evenement );
 	// Ajoute un evenement à l'un des capteurs de la ville,

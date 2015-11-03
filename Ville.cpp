@@ -35,6 +35,10 @@ using namespace std;
 
 
 void Ville::StatsJour( int d7 )
+// ALgorithme :
+// Complexité : O(n), avec n le nombre de capteurs de la ville
+// TODO: un for de taille 4 est-il + ou - long que de faire les 4 opérations inline ? je dirais +, mais de combien ?
+// A noter que l'affichage prend beacoup de temps!
 {
 	// Creation de la structure de retour et variables pratiques
 	Vecteur<double> statsRetour;
@@ -75,6 +79,8 @@ void Ville::StatsJour( int d7 )
 
 void Ville::EmbouteillageJour( int d7 )
 // Algorithme :
+// Complexité : O(n*m), avec un for de taille 24 dans un for de taille n = nombre de capteurs de la ville
+//				m est le nombre d'évènements dans le vecteur du jour dans EmbouteillageJour(d7)
 {
 	// Création structure pour affichage et variables pratiques
 	Vecteur<double> stats;
@@ -110,9 +116,12 @@ void Ville::EmbouteillageJour( int d7 )
 
 } //----- Fin de EmbouteillageJour
 
-void Ville::TempsParcours( int d7, int hDebut, int hFin, Vecteur<int>& idSegments )
-// Algorithme :	TODO: complexite en n^4... A ameliorer sans doute
-// TODO: pour le moment , non-prise en compte du temps de déplacement ni des endroits sans données
+// TODO: void Ville::TempsParcours2 ( int d7, int hDebut, int hFin, Vecteur<int>& idSegments )
+//		 à adapter pour Capteur::TempsSgement2
+void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegments )
+// Algorithme :
+// Complexite : O(nbH*nbSegments*60*nbEvent)... A ameliorer sans doute
+// TODO: pour le moment , non-prise en compte des endroits sans données
 {
 	// Création variables pour affichage et variables pratiques
 	int temps;
@@ -133,7 +142,7 @@ void Ville::TempsParcours( int d7, int hDebut, int hFin, Vecteur<int>& idSegment
 	// Prise une fois pour toutes des capteurs qui nous intéressent
 	for ( int i = 0; i < idSegments.GetTaille(); i++ )
 	{
-		for ( int j = 0; j < NB_MAX_CAPTEURS; j++ )
+		for ( int j = 0; j < nombreCapteurs; j++ )
 		{
 			if ( capteurs[j]->GetID() == idSegments[i] )
 			{
@@ -148,10 +157,21 @@ void Ville::TempsParcours( int d7, int hDebut, int hFin, Vecteur<int>& idSegment
 	{
 		for ( int minute = 0; minute < 60; minute++ )
 		{
-			temps = 0;	// Remise à jour pour calcul du temps lors du départ à heure:minute
+
+			temps = 0;	// Remise à jour pour calcul du temps lors du départ à heure:minuteActuelle
+			minuteActuelle = minute;
+			heureActuelle = heure;
 			for (int i = 0; i < idSegments.GetTaille(); i++)
 			{
-				temps += capteursSegment[i]->TempsSegment(d7, heure, minute);
+				int tempsAdditionnel = capteursSegment[i]->TempsSegment(d7, heureActuelle, minuteActuelle);
+				temps += tempsAdditionnel;
+				minuteActuelle += tempsAdditionnel;
+				if ( minuteActuelle >= 60 )
+				{
+					heureActuelle += 1;
+					minuteActuelle %= 60;
+				}
+
 			}
 			// En cas de nouveau meilleur temps : mise a jour
 			if ( (temps < meilleurTemps || meilleurTemps == 0) && temps > 0 )
@@ -170,8 +190,10 @@ void Ville::TempsParcours( int d7, int hDebut, int hFin, Vecteur<int>& idSegment
 
 void Ville::AjouterEvenement( int id, Evenement& evenement )
 // Algorithme :
+// Complexité : O(n), avec n le nombre de capteur de la ville
+// TODO: complexité améliorable en triant le tableau
 {
-	for (int i = 0; i < nombreCapteurs; i++)
+	for ( int i = 0; i < nombreCapteurs; i++ )
 	{
 		if (capteurs[i]->GetID() == id)
 		{
@@ -202,6 +224,8 @@ Ville &Ville::operator = ( const Ville &uneVille )
 
 Capteur& Ville::operator[] ( int idCapteur )
 // Algorithme :
+// Complexité : O(n), avec break dès qu'on a trouvé
+// TODO: complexité améliorable en O(log2(n)) si tableau trié
 {
 	for (int i = 0; i < nombreCapteurs; i++)
 	{

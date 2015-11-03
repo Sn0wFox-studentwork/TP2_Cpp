@@ -9,6 +9,10 @@ copyright            : (C) 2015 par Pericas-Belletier
 #if ! defined ( BENCH_H )
 #define BENCH_H
 
+#include <ctime>
+#include <iostream>
+using namespace std;
+
 // Version fonction generique :
 template<class C, typename retour>
 void bench(retour(C::*pf)(), C objet, int repetitions)

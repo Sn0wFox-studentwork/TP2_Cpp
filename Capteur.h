@@ -95,7 +95,7 @@ protected:
 
 int identifiant;
 
-// TODO: optimiser structure / dédioubler structure pour + d'efficacite
+// TODO: optimiser structure / dédoubler structure pour + d'efficacite
 Vecteur <Evenement> d1Contenu;
 Vecteur <Evenement> d2Contenu;
 Vecteur <Evenement> d3Contenu;

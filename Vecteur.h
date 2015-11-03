@@ -10,6 +10,8 @@
 #define VECTEUR_H
 
 //--------------------------------------------------- Interfaces utilisées
+#include <iostream>
+using namespace std;
 
 //------------------------------------------------------------- Constantes
 const int TAILLE_MAX_BASE = 5;

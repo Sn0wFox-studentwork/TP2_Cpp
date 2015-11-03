@@ -12,6 +12,7 @@ copyright            : (C) 2015 par Pericas-Belletier
 //-------------------------------------------------------- Include système
 using namespace std;
 #include <iostream>
+#include <cstddef>
 
 //------------------------------------------------------ Include personnel
 #include "Capteur.h"
@@ -30,6 +31,7 @@ using namespace std;
 
 void Capteur::Inserer( Evenement& unEvenement )
 // Algorithme :
+// Complexité : O(1), avec 2 switchs
 {
 	// Variables permettant de positionner l'insertion
 	Vecteur<Evenement>* jour = nullptr;
@@ -97,6 +99,7 @@ void Capteur::Inserer( Evenement& unEvenement )
 
 Vecteur<double> Capteur::StatsPropres()
 // Algorithme :
+// Complexité : O(1), avec un for de taille 4
 {
 	// Creation de la structure de retour et variables pratiques
 	Vecteur<double> statsRetour;
@@ -125,6 +128,7 @@ Vecteur<double> Capteur::StatsPropres()
 
 Vecteur<double> Capteur::StatsJour( int d7 )
 // Algorithme :
+// Complexité : O(1), avec un switch et un for de taille 4
 {
 	// Création structure de retour et variables pratiques
 	Vecteur<double> statsRetour;
@@ -163,16 +167,18 @@ Vecteur<double> Capteur::StatsJour( int d7 )
 	total = jourTab[4];
 
 	// Insertion dans la structure de retour
-	statsRetour.insererFin( jourTab[0] / total );
-	statsRetour.insererFin( jourTab[1] / total );
-	statsRetour.insererFin( jourTab[2] / total );
-	statsRetour.insererFin( jourTab[3] / total );
+	for ( int i = 0; i < TAILLE_RESUME - 1; i++ )
+	{
+		statsRetour.insererFin( jourTab[i] / total );
+	}
 
 	return statsRetour;
 
 } //----- Fin de StatsJour
 
-Vecteur<int> Capteur::DonneesJour(int d7)
+Vecteur<int> Capteur::DonneesJour( int d7 )
+// Algorithme :
+// Complexité : O(1), avec un switch et for de taille 5
 {
 	// Création structure de retour et variables pratiques
 	Vecteur<int> donneesRetour;
@@ -208,11 +214,10 @@ Vecteur<int> Capteur::DonneesJour(int d7)
 	}  //----- Fin de switch ( d7 )
 
 	// Insertion dans la structure de retour
-	donneesRetour.insererFin( jourTab[0] );
-	donneesRetour.insererFin( jourTab[1] );
-	donneesRetour.insererFin( jourTab[2] );
-	donneesRetour.insererFin( jourTab[3] );
-	donneesRetour.insererFin( jourTab[4] );
+	for ( int i = 0; i < TAILLE_RESUME; i++ )
+	{
+		donneesRetour.insererFin( jourTab[i] );
+	}
 
 	return donneesRetour;
 
@@ -220,6 +225,8 @@ Vecteur<int> Capteur::DonneesJour(int d7)
 
 Vecteur<int> Capteur::EmbouteillageJour( int d7 )
 // Algorithme :
+// Complexité : O(n), avec 1 switch et un for de taille n = taille du vecteur d'évènement du jour
+// TODO: a noter qu'on pourrait passer la complexité en O(1) en ajoutant juste 24 tableau de resume par heure
 // Structure de retour :	Vecteur 0->23 : nombre d'embouteillage recense par heure
 //							24->47 : nombre total de donnees par heure
 {
@@ -264,7 +271,7 @@ Vecteur<int> Capteur::EmbouteillageJour( int d7 )
 	}
 
 	// Parcours du tableau d'événements et remplissage de la structure de retour
-	for (int i = 0; i < jour->GetTaille(); i++)
+	for ( int i = 0; i < jour->GetTaille(); i++ )
 	{
 		trafic = (*jour)[i].GetTrafic();
 		if ( trafic == R || trafic == N )
@@ -278,7 +285,15 @@ Vecteur<int> Capteur::EmbouteillageJour( int d7 )
 
 } //----- Fin de EmbouteillageJour
 
-int Capteur::TempsSegment( int d7, int heure, int minute )
+// TODO: Vecteur<int> Capteur::TempsSegment2 ( int d7, int hDebut, int hFin, int mDebut, int mFin )
+int Capteur::TempsSegment ( int d7, int heure, int minute )
+// Algorithme :
+// Complexité : O(n), avec un switch et un if+switch dans un for de taille n = taille du vecteur d'évènement du jour
+// A noter : toutefois, on sort de la boucle dès qu'on a trouvé le bon horaire
+// TODO: complexité améliorable en utilisant un index... encore faut-il pouvoir le mettre en place,
+//		 ce qui ne semble pas réalisable malgré le fait qu'on sache que les évènement arrivent dans l'ordre
+//		 puisqu'on ne peut pas savoir combien d'instants n'auront pas d'évènements...
+//		 à moins de réaliser un tableau avec beaucoup trop de trous
 {
 	// Création variable de retour et variables pratiques
 	int tempsParcours = 0;

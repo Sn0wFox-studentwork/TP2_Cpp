@@ -1,0 +1,8 @@
+*.obj
+*.log
+Debug/TP_CPP_2.tlog/CL.command.1.tlog
+*.tlog
+TP_CPP_2.vcxproj
+TP_CPP_2.vcxproj.filters
+*.idb
+Debug/vc140.pdb

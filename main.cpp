@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 		v.AjouterEvenement(i%5, e);
 		
 	}*/
-
+	
 	v.AjouterEvenement(2, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));
 	v.AjouterEvenement(2, Evenement(R, Temps(5, 1586, 5, 2, 5, 6)));
 	v.AjouterEvenement(2, Evenement(N, Temps(5, 1586, 5, 2, 5, 7)));
@@ -70,10 +70,9 @@ int main(int argc, char* argv[])
 
 	v.TempsParcours(5, 0, 23, s);
 
-	//bench(&Capteur::TempsSegment, v[2], 5, 6, 6, 1000000);
+	bench(&Capteur::TempsSegment, v[2], 5, 6, 6, 1000000);
 	//bench(&Ville::StatsJour, v, 5, 100);
-	cout << sizeof(int) << endl;
-	bench(&Ville::AjouterEvenement, v, 55, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)), 20000000);
+	//bench(&Ville::AjouterEvenement, v, 55, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)), 20000000);
 	//bench(&Ville::TempsParcours, v, 5, 0, 23, s, 100);
 
 	string lecture;
