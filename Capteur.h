@@ -35,26 +35,35 @@ public:
     // Contrat :
     //
 	void Inserer( Evenement& unEvenement );
-	//insere un evenement dans le bon tableau
+	// Mode d'emploi :	insere l'événement unEvenement dans la structure de donnée du capteur courant.
+	//					Si l'événement existe déjà, il est inséré tout de même (présent en double par la suite).
 	
 	Vecteur<double> StatsPropres();
-	//renvoie les stats tous jours confondus
+	// Mode d'emploi :	Calcul les statistiques du capteur courant tout jours confondus.
+	//					Les statistiques sont sous la forme de doubles compris entre 0 et 1 (précision du double).
+	//					Si on ne dispose d'aucune donnée, toutes les statistiques seront à 0.
+	//					Retourne une instance de Vecteur<double> de taille 4 contenant les statistiques dans l'ordre suivant :
+	//					% de N (indice 0), % de R, % de J, % de V (indice 3).
 	
 	Vecteur<double> StatsJour( int d7 );
-	//renvoie les stats pour un jour de la semaine
+	// Mode d'emploi :	Calcul les statistiques du capteur courant tout jours confondus.
+	//					Les statistiques sont sous la forme de doubles compris entre 0 et 1.
+	//					Si on ne dispose d'aucune donnée, toutes les statistiques seront à 0.
+	//					Retourne une instance de Vecteur<double> de taille 4 contenant les statistiques dans l'ordre suivant :
+	//					% de N (indice 0), % de R, % de J, % de V (indice 3).
 
 	Vecteur<int> DonneesJour( int d7 );
-	//renvoie les données pour un jour de la semaine
+	// Mode d'emploi :	renvoie les données pour un jour de la semaine
 	
 	Vecteur<int> EmbouteillageJour( int d7 );
-	//renvoie le nombre de R et de N pour chaque heure d'un jour de la semaine, et le total
+	// Mode d'emploi :	renvoie le nombre de R et de N pour chaque heure d'un jour de la semaine, et le total
 	
 	int TempsSegment( int d7, int heure, int minute );
-	// Temps necessaire pour passer par le segment selon l'heure entre tdebut et tfin au jour de la semaine d7
+	// Mode d'emploi :	Temps necessaire pour passer par le segment selon l'heure entre tdebut et tfin au jour de la semaine d7
 	// Temps en minutes : c'est à l'appelant de faire la conversion si besoin
 
 	int GetID() const { return identifiant; }
-	// Retourne l'identifiant du capteur
+	// Mode d'emploi :	Retourne l'identifiant du capteur courant.
 
 //------------------------------------------------- Surcharge d'opérateurs
     Capteur& operator= ( const Capteur& unCapteur );
@@ -95,7 +104,6 @@ protected:
 
 int identifiant;
 
-// TODO: optimiser structure / dédoubler structure pour + d'efficacite
 Vecteur <Evenement> d1Contenu;
 Vecteur <Evenement> d2Contenu;
 Vecteur <Evenement> d3Contenu;

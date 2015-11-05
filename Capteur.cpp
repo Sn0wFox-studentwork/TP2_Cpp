@@ -12,7 +12,7 @@ copyright            : (C) 2015 par Pericas-Belletier
 //-------------------------------------------------------- Include système
 using namespace std;
 #include <iostream>
-#include <cstddef>
+#include <cstddef>		// Utilisation de nullptr
 
 //------------------------------------------------------ Include personnel
 #include "Capteur.h"
@@ -407,7 +407,7 @@ Capteur::Capteur ( const Capteur &unCapteur )
 		d6Resume[i] = unCapteur.d6Resume[i];
 		d7Resume[i] = unCapteur.d7Resume[i];
 	}
-
+	
 	// Utilisation de la surcharge de = pour Vecteur
 	d1Contenu = unCapteur.d1Contenu;
 	d2Contenu = unCapteur.d2Contenu;

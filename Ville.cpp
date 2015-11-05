@@ -61,7 +61,7 @@ void Ville::StatsJour( int d7 )
 	}
 
 	// Creation des stats
-	if (total != 0)
+	if ( total != 0 )
 	{
 		for ( int i = 0; i < 4; i++ )
 		{
@@ -80,7 +80,7 @@ void Ville::StatsJour( int d7 )
 void Ville::EmbouteillageJour( int d7 )
 // Algorithme :
 // Complexité : O(n*m), avec un for de taille 24 dans un for de taille n = nombre de capteurs de la ville
-//				m est le nombre d'évènements dans le vecteur du jour dans EmbouteillageJour(d7)
+//				m est le nombre d'évènements dans le vecteur du jour dans EmbouteillageJour( d7 )
 {
 	// Création structure pour affichage et variables pratiques
 	Vecteur<double> stats;
@@ -122,15 +122,18 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 // Algorithme :
 // Complexite : O(nbH*nbSegments*60*nbEvent)... A ameliorer sans doute
 // TODO: pour le moment , non-prise en compte des endroits sans données
+// TODO: et si on part dimanche à 23H ?
 {
 	// Création variables pour affichage et variables pratiques
 	int temps;
 	int meilleurTemps;
 	int meilleureMinute;
 	int meilleureHeure;
+	int meilleurJour;
 	int nombreMinutes = (hFin - hDebut + 1) * 60;
 	int heureActuelle = hDebut;
 	int minuteActuelle = 0;
+	int jourActuel = d7;
 	Vecteur<Capteur*> capteursSegment;
 
 	// Init variables
@@ -163,13 +166,22 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 			heureActuelle = heure;
 			for (int i = 0; i < idSegments.GetTaille(); i++)
 			{
-				int tempsAdditionnel = capteursSegment[i]->TempsSegment(d7, heureActuelle, minuteActuelle);
+				int tempsAdditionnel = capteursSegment[i]->TempsSegment(jourActuel, heureActuelle, minuteActuelle);
 				temps += tempsAdditionnel;
 				minuteActuelle += tempsAdditionnel;
 				if ( minuteActuelle >= 60 )
 				{
-					heureActuelle += 1;
+					heureActuelle++;
 					minuteActuelle %= 60;
+					if ( heureActuelle >= 24 )
+					{
+						jourActuel++;
+						if ( jourActuel == 8 )
+						{
+							jourActuel = 1;
+						}
+						heureActuelle %= 24;
+					}
 				}
 
 			}

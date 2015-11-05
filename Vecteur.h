@@ -116,7 +116,6 @@ void Vecteur<T>::insererFin(T objet)
 	if (tailleActuelle >= tailleMax)
 	{
 		tailleMax *= 2;
-		cout << "Taille max : " << tailleMax << endl;
 		T* temp = new T[tailleMax];
 		for (int i = 0; i < tailleActuelle; i++)
 		{
@@ -188,11 +187,10 @@ T Vecteur<T>::operator[] ( int index ) const
   //------------------------------------------------- Surcharge d'opérateurs
 template <class T>
 Vecteur<T> & Vecteur<T>::operator = ( const Vecteur<T> & unVecteur )
-// Algorithme : Si on n'est pas en train de faire unObjetDeMaClasse = unObjetDeMaClasse,
+// Algorithme :		Si on n'est pas en train de faire unVecteur = unVecteur,
 //					on "copie" tout les champs :
-//					on les modifie pour qu'ils soient comme ceux de unObjetDeMaClasse.
-//					On retourne *this pour la bonne marche de la surcharge d'operateur
-//
+//					on les modifie pour qu'ils soient comme ceux de unVecteur.
+//					On retourne *this pour la bonne marche de la surcharge d'operateur.
 {
 	if (this != &unVecteur)
 	{
