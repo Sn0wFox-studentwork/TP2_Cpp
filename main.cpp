@@ -70,10 +70,10 @@ int main(int argc, char* argv[])
 
 	v.TempsParcours(5, 0, 23, s);
 
-	bench(&Capteur::TempsSegment, v[2], 5, 6, 6, 1000000);
+	//bench(&Capteur::TempsSegment, v[2], 5, 6, 6, 1000000);
 	//bench(&Ville::StatsJour, v, 5, 100);
 	//bench(&Ville::AjouterEvenement, v, 55, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)), 20000000);
-	//bench(&Ville::TempsParcours, v, 5, 0, 23, s, 100);
+	//bench(&Ville::TempsParcours, v, 5, 0, 23, s, 100);*/
 
 	string lecture;
 	cin >> lecture;
@@ -127,9 +127,9 @@ int main(int argc, char* argv[])
 			v.AjouterEvenement( id, Evenement(trafic, Temps( d7, annee, mois, jour, heure, minute ) ) );
 
 		}
-		else if ( lecture == "STATS_C" )
+		else if ( lecture == "NB_STATS_C" )
 		{
-			// Code cmd2 STATS_C
+			// Code cmd2 NB_STATS_C
 			int idCapteur;
 			cin >> idCapteur;
 
@@ -141,9 +141,9 @@ int main(int argc, char* argv[])
 			cout << "N " << stats[3] * 100 << "%\r\n";
 			
 		}
-		else if ( lecture == "STATS_D7" )
+		else if ( lecture == "NB_STATS_D7" )
 		{
-			// Code cmd3 STATS_D7
+			// Code cmd3 NB_STATS_D7
 			int d7;
 			cin >> d7;
 

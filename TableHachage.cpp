@@ -47,11 +47,22 @@ void TableHachage::Inserer ( Capteur * capteur )
 {
 	int indice = Hacher( capteur );
 	Capteur* c = table[indice];
+	Capteur* cPrecedent = nullptr;
 	while ( c != nullptr )
 	{
+		cPrecedent = c;
 		//c = c->getNext( );
 	}
-	c = capteur;
+	
+	if ( cPrecedent )
+	{
+		//c->setNext( capteur );
+	}
+	else
+	{
+		table[indice] = capteur;
+	}
+	
 
 }  //----- Fin de Inserer
 
@@ -101,6 +112,16 @@ TableHachage & TableHachage::operator= ( const TableHachage & uneTableHachage )
 
 } //----- Fin de operator=
 
+Capteur *& TableHachage::operator[]( int index )
+{
+	return table[index];
+}
+
+Capteur *& TableHachage::operator[]( int index ) const
+{
+	return table[index];
+}
+
 //-------------------------------------------- Constructeurs - destructeur
 TableHachage::TableHachage( const TableHachage & uneTableHachage ) :
 	tailleTable(uneTableHachage.tailleTable),
@@ -125,6 +146,11 @@ TableHachage::TableHachage ( int taille, int nbPremier ):
 #endif
 
 	table = new Capteur*[ tailleTable ];
+	// Initialisation évitant une tonne de bugs :
+	for ( int i = 0; i < tailleTable; i++ )
+	{
+		table[i] = nullptr;
+	}
 } //----- Fin de ${file_base}
 
 

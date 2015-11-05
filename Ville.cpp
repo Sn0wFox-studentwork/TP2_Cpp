@@ -36,80 +36,82 @@ using namespace std;
 
 void Ville::StatsJour( int d7 )
 // Algorithme :
-// Complexité : O(n), avec n le nombre de capteurs de la ville
-// TODO: un for de taille 4 est-il + ou - long que de faire les 4 opérations inline ? je dirais +, mais de combien ?
+// Complexité : O(1) (1440 itérations à chaque fois)
 // A noter que l'affichage prend beacoup de temps!
-// Note :   La table de hachage n'ameliore pas la complexité à chaque fois qu'on veut parcourir tous les capteurs
-//          on n'aura donc pas d'amelioration de complexité sur cette méthode
 {
-	// Creation de la structure de retour et variables pratiques
-	Vecteur<double> statsRetour;
+	// Création structure pour affichage et variables pratiques
 	int total = 0;
-    int nombreCapteurs = listeId.GetTaille();
-    Capteur* capteur = nullptr;
-	// Init de la structure d'affichage
-	for ( int i = 0; i < 4; i++ )
-	{
-		statsRetour.insererFin(0);
-	}
+	int nbVert = 0;
+	int nbJaune = 0;
+	int nbRouge = 0;
+	int nbNoir = 0;
+	int minuteInitiale = (d7 - 1) * HEURE_PAR_JOUR * MIN_PAR_HEURE;
+	int minuteMax = d7 * HEURE_PAR_JOUR * MIN_PAR_HEURE;
+	double stats[NB_STATS];
 
-	// Parcours du tableau de capteurs et remplissage de la structure de retour
-	for ( int i = 0; i < nombreCapteurs; i++ )
+	for (int minute = minuteInitiale; minute < minuteMax; minute++)
 	{
-	    capteur = tableDeHachage.GetCapteur(listeId[i]);
-		for (int j = 0; j < 4; j++)
-		{
-			statsRetour[j] += (capteur->DonneesJour(d7))[j];	// TODO: plus rapide a l'execution si on stocke dans une variable ou pas ?
-		}
-		total += (capteurs->DonneesJour(d7))[4];
+		nbVert += semaineResume[minute][0];
+		nbJaune += semaineResume[minute][1];
+		nbRouge += semaineResume[minute][2];
+		nbNoir += semaineResume[minute][3];
 	}
+	total = nbVert + nbJaune + nbRouge + nbNoir;
 
-	// Creation des stats
-	if ( total != 0 )
+	// Création des statistiques
+	if ( total == 0 )
 	{
-		for ( int i = 0; i < 4; i++ )
+		for ( int i = 0; i < NB_STATS; i++ )
 		{
-			statsRetour[i] /= total;
+			stats[i] = 0;
 		}
+	}
+	else
+	{
+		stats[0] = (double)nbVert / total;
+		stats[1] = (double)nbJaune / total;
+		stats[2] = (double)nbRouge / total;
+		stats[3] = (double)nbNoir / total;
 	}
 
 	// Affichage
-	cout << "V " << statsRetour[0] * 100 << "%\r\n";	// TODO: quelle tronche a la fin de ligne ?
-	cout << "J " << statsRetour[1] * 100 << "%\r\n";
-	cout << "R " << statsRetour[2] * 100 << "%\r\n";
-	cout << "N " << statsRetour[3] * 100 << "%\r\n";
+	cout << "V " << stats[0] * 100 << "%\r\n";	// TODO: quelle tronche a la fin de ligne ?
+	cout << "J " << stats[1] * 100 << "%\r\n";
+	cout << "R " << stats[2] * 100 << "%\r\n";
+	cout << "N " << stats[3] * 100 << "%\r\n";
 
 } //----- Fin de statsJour
 
 void Ville::EmbouteillageJour( int d7 )
 // Algorithme :
-// Complexité : O(n*m), avec un for de taille 24 dans un for de taille n = nombre de capteurs de la ville
-//				m est le nombre d'évènements dans le vecteur du jour dans EmbouteillageJour( d7 )
-// Note :   La table de hachage n'ameliore pas la complexité à chaque fois qu'on veut parcourir tous les capteurs
-//          on n'aura donc pas d'amelioration de complexité sur cette méthode
+// Complexité : O(1) (1440 itérations à chaque fois)
 {
 	// Création structure pour affichage et variables pratiques
-	Vecteur<double> stats;
-	Vecteur<int> total;
-	Vecteur<int> statsCapteur;
-	int nombreCapteurs = listeId.GetTaille();
+	int total[HEURE_PAR_JOUR];
+	int nbEmbouteillage[HEURE_PAR_JOUR];
+	double stats[HEURE_PAR_JOUR];
+	int heureInitiale = (d7 - 1) * HEURE_PAR_JOUR;
+	int heureMax = d7 * HEURE_PAR_JOUR;	
 
 	// Init de la structure d'affichage
-	for ( int i = 0; i < 24; i++ )
+	for ( int i = 0; i < HEURE_PAR_JOUR; i++ )
 	{
-		stats.insererFin(0);
-		total.insererFin(0);
+		nbEmbouteillage[i] = 0;
+		total[i] = 0;
+		stats[i] = 0;
 	}
 
-	// Remplissage de la structure d'affichage
-	for ( int i = 0; i < nombreCapteurs; i++ )
+	// Prise des données
+	for (int h = heureInitiale; h < heureMax; h++)
 	{
-        statsCapteur = this[i]->EmbouteillageJour( d7 )
-		for ( int j = 0; j < 24; j++ )
+		for (int minute = 0; minute < MIN_PAR_HEURE; minute++)
 		{
-			stats[j] += statsCapteur[j];	// TODO: plus rapide a l'execution si on stocke dans une variable ou pas ?
-			total[j] += statsCapteur[j + 24];
+			total[h - heureInitiale] += semaineResume[h * MIN_PAR_HEURE + minute][0];
+			total[h - heureInitiale] += semaineResume[h * MIN_PAR_HEURE + minute][1];
+			nbEmbouteillage[h - heureInitiale] += semaineResume[h * MIN_PAR_HEURE + minute][2];
+			nbEmbouteillage[h - heureInitiale] += semaineResume[h * MIN_PAR_HEURE + minute][3];
 		}
+		total[h - heureInitiale] += nbEmbouteillage[h - heureInitiale];
 	}
 
 	// Creation des stats et affichage
@@ -117,7 +119,7 @@ void Ville::EmbouteillageJour( int d7 )
 	{
 		if ( total[i] != 0 )
 		{
-			stats[i] /= total[i];
+			stats[i] = (double)nbEmbouteillage[i] / total[i];
 		}
 		// Affichage
 		cout << d7 << " " << i << " " << stats[i] * 100 << "%\r\n";		// TODO: quelle tronche a la fin de ligne ?
@@ -129,9 +131,8 @@ void Ville::EmbouteillageJour( int d7 )
 //		 à adapter pour Capteur::TempsSgement2
 void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegments )
 // Algorithme :
-// Complexite : O(nbH*nbSegments*60*nbEvent)... A ameliorer sans doute
+// Complexite : O(nbH*nbSegments*60*nbEvent)... Le seul sur lequel on peut jouer est nbEvent
 // TODO: pour le moment , non-prise en compte des endroits sans données
-// TODO: et si on part dimanche à 23H ?
 {
 	// Création variables pour affichage et variables pratiques
 	int temps;
@@ -175,7 +176,7 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 			heureActuelle = heure;
 			for (int i = 0; i < idSegments.GetTaille(); i++)
 			{
-				int tempsAdditionnel = this[idSegments[i]]->TempsSegment(jourActuel, heureActuelle, minuteActuelle);
+				int tempsAdditionnel = (*this)[idSegments[i]].TempsSegment(jourActuel, heureActuelle, minuteActuelle);
 				temps += tempsAdditionnel;
 				minuteActuelle += tempsAdditionnel;
 				if ( minuteActuelle >= 60 )
@@ -211,22 +212,45 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 
 void Ville::AjouterEvenement( int id, Evenement& evenement )
 // Algorithme :
-// Complexité : O(1) Grace à la table de Hachage
+// Complexité : O(1) Grace à la table de Hachage, s'il n'y a pas de collisions
 {
 
     Capteur* capteur = nullptr;
+	cout << capteur << ends;
     capteur = tableDeHachage.GetCapteur(id);
+	cout << capteur << endl;
+
     if ( capteur != nullptr )
     {
-        capteur->inserer( evenement );
+        capteur->Inserer( evenement );
     }
-    else//si le capteur n'existe pas
+    else	//si le capteur n'existe pas
     {
-        CreerCapteur( id );//on le crée
-        capteur = tableDeHachage.GetCapteur( id );//on est donc sur qu'il existe maintenant
-        capteur->inserer( evenement );
+        CreerCapteur( id );							//on le crée
+        capteur = tableDeHachage.GetCapteur( id );	//on est donc sur qu'il existe maintenant
+        capteur->Inserer( evenement );
     }
-	return;
+
+	int posStat = 0;
+	int numMinute = ( ( evenement.GetD7( ) - 1 ) * HEURE_PAR_JOUR + evenement.GetHeure( ) ) * MIN_PAR_HEURE + evenement.GetMinute( );
+	switch (evenement.GetTrafic( ))
+	{
+	case V:
+		posStat = 0;
+		break;
+	case J:
+		posStat = 1;
+		break;
+	case R:
+		posStat = 2;
+		break;
+	default:	// case N:
+		posStat = 3;
+		break;
+	}
+
+	cout << numMinute << endl;
+	semaineResume[numMinute][posStat]++;
 
 } //----- Fin de AjouterEvenement
 
@@ -237,7 +261,7 @@ Ville &Ville::operator = ( const Ville &uneVille )
 	nombreCapteurs = uneVille.nombreCapteurs;
 	for (int i = 0; i < nombreCapteurs; i++)
 	{
-		capteurs[i] = new Capteur(*uneVille.capteurs[i]);
+		tableDeHachage[listeId[i]] = new Capteur(*uneVille.tableDeHachage[listeId[i]]);
 	}
 
 	return *this;
@@ -249,43 +273,48 @@ Capteur& Ville::operator[] ( int idCapteur )
 // Algorithme :
 // Complexité : O(1) Grace à la table de Hachage
 {
-	return tableDeHachage.GetCapteur( idCapteur );
+	return *tableDeHachage[idCapteur];
 
 } //----- Fin de operator []
 
 Capteur & Ville::operator[] ( int idCapteur ) const
 // Algorithme :
 {
-	return tableDeHachage.GetCapteur( idCapteur );
+	return *tableDeHachage[idCapteur];
 
 } //----- Fin de operator [] const
 
 
 //-------------------------------------------- Constructeurs - destructeur
-Ville::Ville ( const Ville &uneVille )
+Ville::Ville ( const Ville &uneVille ) :	tableDeHachage( uneVille.tableDeHachage ),
+											nombreCapteurs( uneVille.nombreCapteurs ), listeId( uneVille.listeId )
 // Algorithme :
 {
 #ifdef MAP
 	cout << "Appel au constructeur de copie de <Ville>" << endl;
 #endif
 
-	nombreCapteurs = uneVille.nombreCapteurs;
-	for ( int i = 0; i < nombreCapteurs; i++ )
-	{
-		capteurs[i] = new Capteur(*uneVille.capteurs[i]);
-	}
-
 } //----- Fin de Ville (constructeur de copie)
 
 
-Ville::Ville () :
+Ville::Ville () :	tableDeHachage( NB_MAX_CAPTEURS, NB_PREMIER_BASE ),
+					nombreCapteurs( NB_MAX_CAPTEURS ), listeId()
 // Algorithme :
+// NB: Il EST necessaire ici de faire une taille différente du nombre premier pour éviter les collisions
 {
 #ifdef MAP
 	cout << "Appel au constructeur de <Ville>" << endl;
 #endif
-    tableDeHachage = new TableHachage( NB_PREMIER_BASE, NB_PREMIER_BASE );//Il n'est pas necessaire ici de faire une taille différente du nombre premier
-	listeId = new vecteur<int>;
+
+	// Initialisation du résumé hebdomadaire
+	for (int minute = 0; minute < NB_MIN_PAR_SEMAINE; minute++)
+	{
+		for (int numStat = 0; numStat < NB_STATS; numStat++)
+		{
+			semaineResume[minute][numStat] = 0;
+		}
+	}
+
 } //----- Fin de Ville
 
 
@@ -295,8 +324,7 @@ Ville::~Ville ()
 #ifdef MAP
 	cout << "Appel au destructeur de <Ville>" << endl;
 #endif
-	delete tableDeHachage;
-	delete [] listeId;
+
 } //----- Fin de ~Ville
 
 
@@ -310,6 +338,7 @@ void Ville::CreerCapteur( int id )
 	Capteur* capteur = new Capteur( id );
 	tableDeHachage.Inserer( capteur );
     listeId.insererFin( id );
+
 } //----- Fin de creerCapteur
 
 //------------------------------------------------------- Méthodes privées

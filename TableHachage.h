@@ -55,6 +55,12 @@ public:
 	// Contrat :
 	//
 
+	Capteur*& operator[] ( int index );		// ATTENTION : retour de ref, sinon tout plante
+	// Acces à l'element contenu à l'index index
+
+	Capteur*& operator[] ( int index ) const;
+	// Acces à l'element contenu à l'index index
+
 
 	//-------------------------------------------- Constructeurs - destructeur
 	TableHachage ( const TableHachage &uneTableHachage );

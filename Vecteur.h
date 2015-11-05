@@ -67,9 +67,7 @@ public:
     // Contrat :
     //
 
-    Vecteur ( );		// TODO: pour aller + vite et ne faire qu'une seule alloc, mettre un param par defaut :
-						// Vecteur( unsigned int taille = 5 ) (5 me semble pas mal vu que les plus petits font 4 ou 5 cases)
-						// On pourra alors mettre ce qu'on veut a l'appel et gagner du temps ( pour embouteillage par exemple )
+    Vecteur ( int tailleMax = TAILLE_MAX_BASE );
     // Mode d'emploi :
     //
     // Contrat :
@@ -209,14 +207,14 @@ Vecteur<T> & Vecteur<T>::operator = ( const Vecteur<T> & unVecteur )
 
   //-------------------------------------------- Constructeurs - destructeur
 template <class T>
-Vecteur<T>::Vecteur( const Vecteur<T> & unVecteur )
+Vecteur<T>::Vecteur( const Vecteur<T> & unVecteur ) :	tailleActuelle(unVecteur.tailleActuelle),
+														tailleMax(unVecteur.tailleMax)
 // Algorithme : copie sequentielle d'éléments
 {
 #ifdef MAP
 	cout << "Appel au constructeur de copie de <Vecteur>" << endl;
 #endif
-	tailleActuelle = unVecteur.tailleActuelle;
-	tailleMax = unVecteur.tailleMax;
+
 	elements = new T[tailleMax];
 	for (int i = 0; i<unVecteur.tailleActuelle; i++)
 	{
@@ -226,20 +224,19 @@ Vecteur<T>::Vecteur( const Vecteur<T> & unVecteur )
 } //----- Fin de Vecteur (constructeur de copie)
 
 template<class T>
-Vecteur<T>::Vecteur()
-// Algorithme : Cree un vecteur avec de la place prête pour TAILLE_MAX_BASE insertions
-//
+Vecteur<T>::Vecteur( int tMax ) : tailleActuelle(0), tailleMax(tMax)
+// Algorithme : Cree un vecteur avec de la place prête pour tMax insertions
 {
 #ifdef MAP
 	cout << "Appel au constructeur de <Vecteur>" << endl;
 #endif
-	tailleActuelle = 0;
-	tailleMax = TAILLE_MAX_BASE;
+
 	elements = new T[tailleMax];
+
 } //----- Fin de Vecteur
 
 template <class T>
-Vecteur<T>::~Vecteur()
+Vecteur<T>::~Vecteur( )
 // Algorithme : Indique qu'il faut supprimer un tableau d'éléments
 // donc potentiellement d'objets
 {

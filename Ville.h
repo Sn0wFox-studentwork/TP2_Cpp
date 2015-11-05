@@ -16,6 +16,9 @@
 //------------------------------------------------------------- Constantes
 
 const int NB_PREMIER_BASE = 2239;
+const int NB_MAX_CAPTEURS = 1500;
+const int NB_MIN_PAR_SEMAINE = JOUR_PAR_SEMAINE * HEURE_PAR_JOUR * MIN_PAR_HEURE;
+const int NB_STATS = 4;
 
 //------------------------------------------------------------------ Types
 
@@ -99,7 +102,16 @@ protected:
 //----------------------------------------------------- Attributs protégés
 
 TableHachage tableDeHachage;
+int nombreCapteurs;
 Vecteur<int> listeId;
+int semaineResume[NB_MIN_PAR_SEMAINE][NB_STATS];
+/* NB : Structure de semaineResume :
+	0 : nombre de V
+	1 : nombre de J
+	2 : nombre de R
+	3 : nombre de N
+	Une case i correspond à la ième minute de la semaine.
+*/
 
 private:
 //------------------------------------------------------- Attributs privés
