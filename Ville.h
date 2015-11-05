@@ -11,18 +11,19 @@
 
 //--------------------------------------------------- Interfaces utilisées
 #include "Capteur.h"
+#include "TableHachage.h"
 
+//------------------------------------------------------------- Constantes
 
-//------------------------------------------------------------- Constantes 
-const int NB_MAX_CAPTEURS = 1500;
+const int NB_PREMIER_BASE = 2239;
 
-//------------------------------------------------------------------ Types 
+//------------------------------------------------------------------ Types
 
-//------------------------------------------------------------------------ 
+//------------------------------------------------------------------------
 // Rôle de la classe <Ville>
 //
 //
-//------------------------------------------------------------------------ 
+//------------------------------------------------------------------------
 
 class Ville
 {
@@ -37,10 +38,10 @@ public:
     //
 	void StatsJour( int d7 );
 	// Affiche les statistiques de trafic d'une ville pour un jour de la semaine
-	
+
 	void EmbouteillageJour( int d7 );
 	// Affiche le pourcentage de R et N pour chaque heure d'un jour de la semaine
-	
+
 	void TempsParcours( int d7, int hDebut, int hFin, Vecteur<int>& idSegments );
 	// Affiche l'heure de depart et le temps de parcours minimal pour parcourir idSegments entre tdebut et tfin au jour d7 de la semaine
 	// Passage par référence pour aller + vite
@@ -56,7 +57,7 @@ public:
     //
     // Contrat :
     //
-    
+
     Capteur& operator[] ( int idCapteur );
     // Accès à un capteur
 
@@ -82,7 +83,7 @@ public:
     // Contrat :
     //
 
-//------------------------------------------------------------------ PRIVE 
+//------------------------------------------------------------------ PRIVE
 
 protected:
 //----------------------------------------------------- Méthodes protégées
@@ -96,9 +97,9 @@ private:
 
 protected:
 //----------------------------------------------------- Attributs protégés
-Capteur* capteurs[NB_MAX_CAPTEURS];
-int nombreCapteurs;
-//TableDeHachage tableDeHachage;
+
+TableHachage tableDeHachage;
+Vecteur<int> listeId;
 
 private:
 //------------------------------------------------------- Attributs privés

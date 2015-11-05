@@ -35,15 +35,18 @@ using namespace std;
 
 
 void Ville::StatsJour( int d7 )
-// ALgorithme :
+// Algorithme :
 // Complexité : O(n), avec n le nombre de capteurs de la ville
 // TODO: un for de taille 4 est-il + ou - long que de faire les 4 opérations inline ? je dirais +, mais de combien ?
 // A noter que l'affichage prend beacoup de temps!
+// Note :   La table de hachage n'ameliore pas la complexité à chaque fois qu'on veut parcourir tous les capteurs
+//          on n'aura donc pas d'amelioration de complexité sur cette méthode
 {
 	// Creation de la structure de retour et variables pratiques
 	Vecteur<double> statsRetour;
 	int total = 0;
-
+    int nombreCapteurs = listeId.GetTaille();
+    Capteur* capteur = nullptr;
 	// Init de la structure d'affichage
 	for ( int i = 0; i < 4; i++ )
 	{
@@ -53,11 +56,12 @@ void Ville::StatsJour( int d7 )
 	// Parcours du tableau de capteurs et remplissage de la structure de retour
 	for ( int i = 0; i < nombreCapteurs; i++ )
 	{
+	    capteur = tableDeHachage.GetCapteur(listeId[i]);
 		for (int j = 0; j < 4; j++)
 		{
-			statsRetour[j] += (capteurs[i]->DonneesJour(d7))[j];	// TODO: plus rapide a l'execution si on stocke dans une variable ou pas ?
+			statsRetour[j] += (capteur->DonneesJour(d7))[j];	// TODO: plus rapide a l'execution si on stocke dans une variable ou pas ?
 		}
-		total += (capteurs[i]->DonneesJour(d7))[4];
+		total += (capteurs->DonneesJour(d7))[4];
 	}
 
 	// Creation des stats
@@ -81,11 +85,15 @@ void Ville::EmbouteillageJour( int d7 )
 // Algorithme :
 // Complexité : O(n*m), avec un for de taille 24 dans un for de taille n = nombre de capteurs de la ville
 //				m est le nombre d'évènements dans le vecteur du jour dans EmbouteillageJour( d7 )
+// Note :   La table de hachage n'ameliore pas la complexité à chaque fois qu'on veut parcourir tous les capteurs
+//          on n'aura donc pas d'amelioration de complexité sur cette méthode
 {
 	// Création structure pour affichage et variables pratiques
 	Vecteur<double> stats;
 	Vecteur<int> total;
-	
+	Vecteur<int> statsCapteur;
+	int nombreCapteurs = listeId.GetTaille();
+
 	// Init de la structure d'affichage
 	for ( int i = 0; i < 24; i++ )
 	{
@@ -94,12 +102,13 @@ void Ville::EmbouteillageJour( int d7 )
 	}
 
 	// Remplissage de la structure d'affichage
-	for (int i = 0; i < nombreCapteurs; i++)
+	for ( int i = 0; i < nombreCapteurs; i++ )
 	{
+        statsCapteur = this[i]->EmbouteillageJour( d7 )
 		for ( int j = 0; j < 24; j++ )
 		{
-			stats[j] += (capteurs[i]->EmbouteillageJour(d7))[j];	// TODO: plus rapide a l'execution si on stocke dans une variable ou pas ?
-			total[j] += (capteurs[i]->EmbouteillageJour(d7))[j + 24];
+			stats[j] += statsCapteur[j];	// TODO: plus rapide a l'execution si on stocke dans une variable ou pas ?
+			total[j] += statsCapteur[j + 24];
 		}
 	}
 
@@ -134,14 +143,14 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 	int heureActuelle = hDebut;
 	int minuteActuelle = 0;
 	int jourActuel = d7;
-	Vecteur<Capteur*> capteursSegment;
+	//Vecteur<Capteur*> capteursSegment;
 
 	// Init variables
 	temps = 0;
 	meilleurTemps = 0;
 	meilleureHeure = 0;
 	meilleureMinute = 0;
-
+/*
 	// Prise une fois pour toutes des capteurs qui nous intéressent
 	for ( int i = 0; i < idSegments.GetTaille(); i++ )
 	{
@@ -154,7 +163,7 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 			}
 		}
 	}
-
+*/
 	// Recherche du meilleur temps
 	for ( int heure = hDebut; heure <= hFin; heure++ )
 	{
@@ -166,7 +175,7 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 			heureActuelle = heure;
 			for (int i = 0; i < idSegments.GetTaille(); i++)
 			{
-				int tempsAdditionnel = capteursSegment[i]->TempsSegment(jourActuel, heureActuelle, minuteActuelle);
+				int tempsAdditionnel = this[idSegments[i]]->TempsSegment(jourActuel, heureActuelle, minuteActuelle);
 				temps += tempsAdditionnel;
 				minuteActuelle += tempsAdditionnel;
 				if ( minuteActuelle >= 60 )
@@ -202,20 +211,22 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 
 void Ville::AjouterEvenement( int id, Evenement& evenement )
 // Algorithme :
-// Complexité : O(n), avec n le nombre de capteur de la ville
-// TODO: complexité améliorable en triant le tableau
+// Complexité : O(1) Grace à la table de Hachage
 {
-	for ( int i = 0; i < nombreCapteurs; i++ )
-	{
-		if (capteurs[i]->GetID() == id)
-		{
-			capteurs[i]->Inserer( evenement );
-			return;
-		}
-	}
 
-	CreerCapteur( id );
-	capteurs[nombreCapteurs - 1]->Inserer( evenement );
+    Capteur* capteur = nullptr;
+    capteur = tableDeHachage.GetCapteur(id);
+    if ( capteur != nullptr )
+    {
+        capteur->inserer( evenement );
+    }
+    else//si le capteur n'existe pas
+    {
+        CreerCapteur( id );//on le crée
+        capteur = tableDeHachage.GetCapteur( id );//on est donc sur qu'il existe maintenant
+        capteur->inserer( evenement );
+    }
+	return;
 
 } //----- Fin de AjouterEvenement
 
@@ -236,33 +247,16 @@ Ville &Ville::operator = ( const Ville &uneVille )
 
 Capteur& Ville::operator[] ( int idCapteur )
 // Algorithme :
-// Complexité : O(n), avec break dès qu'on a trouvé
-// TODO: complexité améliorable en O(log2(n)) si tableau trié
+// Complexité : O(1) Grace à la table de Hachage
 {
-	for (int i = 0; i < nombreCapteurs; i++)
-	{
-		if ( capteurs[i]->GetID() == idCapteur )
-		{
-			return *capteurs[i];
-		}
-	}
-	cout << "Error, attempted to access an inexistant element" << endl;
-	return *capteurs[0];	// Retour du premier élément pour que le programme ne plante pas
+	return tableDeHachage.GetCapteur( idCapteur );
 
 } //----- Fin de operator []
 
 Capteur & Ville::operator[] ( int idCapteur ) const
 // Algorithme :
 {
-	for (int i = 0; i < nombreCapteurs; i++)
-	{
-		if (capteurs[i]->GetID() == idCapteur)
-		{
-			return *capteurs[i];
-		}
-	}
-	cout << "Error, attempted to access an inexistant element" << endl;
-	return *capteurs[0];	// Retour du premier élément pour que le programme ne plante pas
+	return tableDeHachage.GetCapteur( idCapteur );
 
 } //----- Fin de operator [] const
 
@@ -284,13 +278,14 @@ Ville::Ville ( const Ville &uneVille )
 } //----- Fin de Ville (constructeur de copie)
 
 
-Ville::Ville () : nombreCapteurs(0)
+Ville::Ville () :
 // Algorithme :
 {
 #ifdef MAP
 	cout << "Appel au constructeur de <Ville>" << endl;
 #endif
-	//Rien de plus a faire a priori
+    tableDeHachage = new TableHachage( NB_PREMIER_BASE, NB_PREMIER_BASE );//Il n'est pas necessaire ici de faire une taille différente du nombre premier
+	listeId = new vecteur<int>;
 } //----- Fin de Ville
 
 
@@ -300,10 +295,8 @@ Ville::~Ville ()
 #ifdef MAP
 	cout << "Appel au destructeur de <Ville>" << endl;
 #endif
-	for ( int i = 0; i < nombreCapteurs; i++ )
-	{
-		delete capteurs[i];
-	}
+	delete tableDeHachage;
+	delete [] listeId;
 } //----- Fin de ~Ville
 
 
@@ -315,8 +308,8 @@ void Ville::CreerCapteur( int id )
 {
 	// La verification de l'existence du capteur a été traitée avant l'appel à cette fonction
 	Capteur* capteur = new Capteur( id );
-	capteurs[nombreCapteurs++] = capteur;
-
+	tableDeHachage.Inserer( capteur );
+    listeId.insererFin( id );
 } //----- Fin de creerCapteur
 
 //------------------------------------------------------- Méthodes privées
