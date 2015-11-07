@@ -14,6 +14,7 @@
 #include "Vecteur.h"
 //------------------------------------------------------------- Constantes
 const int TAILLE_RESUME = 5;
+const int NB_STATS = 4;
 
 //------------------------------------------------------------------ Types
 
@@ -46,7 +47,7 @@ public:
 	//					% de N (indice 0), % de R, % de J, % de V (indice 3).
 
 	Vecteur<double> StatsJour( int d7 );
-	// Mode d'emploi :	Calcul les statistiques du capteur courant tout jours confondus.
+	// Mode d'emploi :	Calcul les statistiques du capteur courant pour le jour d7.
 	//					Les statistiques sont sous la forme de doubles compris entre 0 et 1.
 	//					Si on ne dispose d'aucune donnée, toutes les statistiques seront à 0.
 	//					Retourne une instance de Vecteur<double> de taille 4 contenant les statistiques dans l'ordre suivant :
@@ -55,12 +56,10 @@ public:
 	Vecteur<int> DonneesJour( int d7 );
 	// Mode d'emploi :	renvoie les données pour un jour de la semaine
 
-	Vecteur<int> EmbouteillageJour( int d7 );
-	// Mode d'emploi :	renvoie le nombre de R et de N pour chaque heure d'un jour de la semaine, et le total
-
 	int TempsSegment( int d7, int heure, int minute );
-	// Mode d'emploi :	Temps necessaire pour passer par le segment selon l'heure entre tdebut et tfin au jour de la semaine d7
-	// Temps en minutes : c'est à l'appelant de faire la conversion si besoin
+	// Mode d'emploi :	Calcul le temps moyen necessaire pour passer par le segment (= le capteur courant)
+	//					le jour d7, à l'heure heure et à la minute minute.
+	//					Retourne ce temps en minutes : c'est à l'appelant de faire la conversion si besoin.
 
 	int GetID() const { return identifiant; }
 	// Mode d'emploi :	Retourne l'identifiant du capteur courant.
@@ -105,14 +104,7 @@ protected:
 //----------------------------------------------------- Attributs protégés
 
 int identifiant;
-
-Vecteur <Evenement> d1Contenu;
-Vecteur <Evenement> d2Contenu;
-Vecteur <Evenement> d3Contenu;
-Vecteur <Evenement> d4Contenu;
-Vecteur <Evenement> d5Contenu;
-Vecteur <Evenement> d6Contenu;
-Vecteur <Evenement> d7Contenu;
+int semaineResume[MIN_PAR_SEMAINE][NB_STATS];
 int d1Resume[TAILLE_RESUME];
 int d2Resume[TAILLE_RESUME];
 int d3Resume[TAILLE_RESUME];

@@ -15,6 +15,7 @@
 const int MIN_PAR_HEURE = 60;
 const int HEURE_PAR_JOUR = 24;
 const int JOUR_PAR_SEMAINE = 7;
+const int MIN_PAR_SEMAINE = JOUR_PAR_SEMAINE * HEURE_PAR_JOUR * MIN_PAR_HEURE;
 
 //------------------------------------------------------------------ Types
 

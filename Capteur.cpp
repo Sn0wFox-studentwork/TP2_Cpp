@@ -31,69 +31,65 @@ using namespace std;
 
 void Capteur::Inserer( Evenement& unEvenement )
 // Algorithme :
-// Complexité : O(1), avec 2 switchs
+// Complexité : O(1)
 {
 	// Variables permettant de positionner l'insertion
-	Vecteur<Evenement>* jour = nullptr;
-	int * caseResume = nullptr;
+	int indice = ( (unEvenement.GetD7( ) - 1) * HEURE_PAR_JOUR + unEvenement.GetHeure( ) ) * MIN_PAR_HEURE + unEvenement.GetMinute( );
+	int * jourTab = nullptr;
 
-	// Détermination du jour de la semaine
-	switch ( unEvenement.GetD7() )
+	// Détermination de la branche dans laquelle prendre les données
+	switch ( unEvenement.GetD7( ) )
 	{
 	case 1:
-		jour = &d1Contenu;
-		caseResume = d1Resume;
+		jourTab = d1Resume;
 		break;
 	case 2:
-		jour = &d2Contenu;
-		caseResume = d2Resume;
+		jourTab = d2Resume;
 		break;
 	case 3:
-		jour = &d3Contenu;
-		caseResume = d3Resume;
+		jourTab = d3Resume;
 		break;
 	case 4:
-		jour = &d4Contenu;
-		caseResume = d4Resume;
+		jourTab = d4Resume;
 		break;
 	case 5:
-		jour = &d5Contenu;
-		caseResume = d5Resume;
+		jourTab = d5Resume;
 		break;
 	case 6:
-		jour = &d6Contenu;
-		caseResume = d6Resume;
+		jourTab = d6Resume;
 		break;
 	case 7:
-		jour = &d7Contenu;
-		caseResume = d7Resume;
+		jourTab = d7Resume;
 		break;
 	default:
-		// Erreur d'insertion
+		// Erreur : mauvaise demande de jour
 		break;
-	} //----- Fin de switch ( unEvenement.GetD7() )
+	}  //----- Fin de switch ( d7 )
 
-	// Incrémentation de la bonne case de trafic
+	// Incrémentation du résumé de la semaine
 	switch ( unEvenement.GetTrafic() )
 	{
 	case V:
-		caseResume[0]++;
+		semaineResume[indice][0]++;
+		jourTab[0]++;
 		break;
 	case J:
-		caseResume[1]++;
+		semaineResume[indice][1]++;
+		jourTab[1]++;
 		break;
 	case R:
-		caseResume[2]++;
+		semaineResume[indice][2]++;
+		jourTab[2]++;
 		break;
 	default:	// case N:
-		caseResume[3]++;
+		semaineResume[indice][3]++;
+		jourTab[3]++;
 		break;
 
 	} //----- Fin de switch ( unEvenement.GetTrafic() )
 
-	// Insertion dans le vecteur et incrementation du nombre total d'évènements
-	jour->insererFin( unEvenement );
-	caseResume[4]++;
+	// Incrémentation du total
+	jourTab[4]++;
 
 } //----- Fin de Inserer
 
@@ -223,143 +219,45 @@ Vecteur<int> Capteur::DonneesJour( int d7 )
 
 }  //----- Fin de DonneesJour
 
-Vecteur<int> Capteur::EmbouteillageJour( int d7 )
-// Algorithme :
-// Complexité : O(n), avec 1 switch et un for de taille n = taille du vecteur d'évènement du jour
-// TODO: a noter qu'on pourrait passer la complexité en O(1) en ajoutant juste 24 tableau de resume par heure
-// Structure de retour :	Vecteur 0->23 : nombre d'embouteillage recense par heure
-//							24->47 : nombre total de donnees par heure
-{
-	// Création structure de retour et variables pratiques
-	Vecteur<int> donneesRetour;
-	Vecteur<Evenement>* jour = nullptr;
-	Trafic trafic;
-
-	// Détermination de la branche dans laquelle prendre les données
-	switch ( d7 )
-	{
-	case 1:
-		jour = &d1Contenu;
-		break;
-	case 2:
-		jour = &d2Contenu;
-		break;
-	case 3:
-		jour = &d3Contenu;
-		break;
-	case 4:
-		jour = &d4Contenu;
-		break;
-	case 5:
-		jour = &d5Contenu;
-		break;
-	case 6:
-		jour = &d6Contenu;
-		break;
-	case 7:
-		jour = &d7Contenu;
-		break;
-	default:
-		// Erreur : mauvaise demande de jour
-		break;
-	}  //----- Fin de switch ( d7 )
-
-	// Init de la structure de retour
-	for ( int i = 0; i < 48; i++ )
-	{
-		donneesRetour.insererFin(0);
-	}
-
-	// Parcours du tableau d'événements et remplissage de la structure de retour
-	for ( int i = 0; i < jour->GetTaille(); i++ )
-	{
-		trafic = (*jour)[i].GetTrafic();
-		if ( trafic == R || trafic == N )
-		{
-			donneesRetour[(*jour)[i].GetHeure()] += 1;
-		}
-		donneesRetour[(*jour)[i].GetHeure() + 24] += 1;		// TODO: plus rapide avec creation de variable ?
-	}
-
-	return donneesRetour;
-
-} //----- Fin de EmbouteillageJour
-
-// TODO: Vecteur<int> Capteur::TempsSegment2 ( int d7, int hDebut, int hFin, int mDebut, int mFin )
 int Capteur::TempsSegment ( int d7, int heure, int minute )
 // Algorithme :
-// Complexité : O(n), avec un switch et un if+switch dans un for de taille n = taille du vecteur d'évènement du jour
-// A noter : toutefois, on sort de la boucle dès qu'on a trouvé le bon horaire
-// TODO: complexité améliorable en utilisant un index... encore faut-il pouvoir le mettre en place,
-//		 ce qui ne semble pas réalisable malgré le fait qu'on sache que les évènement arrivent dans l'ordre
-//		 puisqu'on ne peut pas savoir combien d'instants n'auront pas d'évènements...
-//		 à moins de réaliser un tableau avec beaucoup trop de trous
+// Complexité : O(1)
+// TODO: les endroits sans données comptes comme des N pour le moment
 {
 	// Création variable de retour et variables pratiques
-	int tempsParcours = 0;
-	Vecteur<Evenement>* jour = nullptr;
+	int nombreTrafic = 0;
+	int traficLePlusProbable = 0;
+	int indice = ((d7 - 1) * HEURE_PAR_JOUR + heure) * MIN_PAR_HEURE + minute;
 
-	// Détermination de la branche dans laquelle prendre les données
-	switch ( d7 )
+	for ( int i = 0; i < NB_STATS; i++ )
 	{
-	case 1:
-		jour = &d1Contenu;
-		break;
-	case 2:
-		jour = &d2Contenu;
-		break;
-	case 3:
-		jour = &d3Contenu;
-		break;
-	case 4:
-		jour = &d4Contenu;
-		break;
-	case 5:
-		jour = &d5Contenu;
-		break;
-	case 6:
-		jour = &d6Contenu;
-		break;
-	case 7:
-		jour = &d7Contenu;
-		break;
-	default:
-		// Erreur : mauvaise demande de jour
-		break;
-	}  //----- Fin de switch ( d7 )
-
-	for ( int i = 0; i < jour->GetTaille(); i++ )
-	{
-		// Recherche de l'horaire
-		if ( (*jour)[i].GetHeure() == heure && (*jour)[i].GetMinute() == minute )
-		{
-			switch ( (*jour)[i].GetTrafic() )
-			{
-			case V:
-				tempsParcours += 1;
-				break;
-			case J:
-				tempsParcours += 2;
-				break;
-			case R:
-				tempsParcours += 4;
-				break;
-			default:	// case N:
-				tempsParcours += 10;
-				break;
-			}
-			break;		// On a trouve, on sort de la boucle
+		if ( semaineResume[indice][i] >= nombreTrafic )	// >= fait prendre le trafic avec le plus long temps de parcours en cas d'égalité
+		{												// ceci se traduit par un trafic N pour les endroits sans données
+			nombreTrafic = semaineResume[indice][i];
+			traficLePlusProbable = i;
 		}
-
 	}
-
-	return tempsParcours;
+	// Retour du temps de parcours le plus probable
+	switch ( traficLePlusProbable )
+	{
+	case 0:		// Trafic = V : temps de parcours de 1 minute
+		return TEMPS_PARCOURS_V;
+	case 1:		// Trafic = J : temps de parcours de 2 minutes
+		return TEMPS_PARCOURS_J;
+	case 2:		// Trafic = R : temps de parcours de 4 minutes
+		return TEMPS_PARCOURS_R;
+	default:	// case 3 ; Trafic = N : temps de parcours de 10 minutes
+		return TEMPS_PARCOURS_N;
+	}
 
 } //----- Fin de TempsSegment
 
 //------------------------------------------------- Surcharge d'opérateurs
 Capteur &Capteur::operator = ( const Capteur &unCapteur )
-// Algorithme :
+// Algorithme :		Si on n'est pas en train de faire unCapteur = unCapteur,
+//					on "copie" tout les champs :
+//					on les modifie pour qu'ils soient comme ceux de unCapteur.
+//					On retourne *this pour la bonne marche de la surcharge d'operateur.
 {
 	identifiant = unCapteur.identifiant;
 
@@ -374,14 +272,13 @@ Capteur &Capteur::operator = ( const Capteur &unCapteur )
 		d7Resume[i] = unCapteur.d7Resume[i];
 	}
 
-	// Utilisation de la surcharge de = pour Vecteur
-	d1Contenu = unCapteur.d1Contenu;
-	d2Contenu = unCapteur.d2Contenu;
-	d3Contenu = unCapteur.d3Contenu;
-	d4Contenu = unCapteur.d4Contenu;
-	d5Contenu = unCapteur.d5Contenu;
-	d6Contenu = unCapteur.d6Contenu;
-	d7Contenu = unCapteur.d7Contenu;
+	for (int m = 0; m < MIN_PAR_SEMAINE; m++)
+	{
+		for (int j = 0; j < NB_STATS; j++)
+		{
+			semaineResume[m][j] = unCapteur.semaineResume[m][j];
+		}
+	}
 
 	return  *this;
 
@@ -407,21 +304,18 @@ Capteur::Capteur ( const Capteur &unCapteur )
 		d6Resume[i] = unCapteur.d6Resume[i];
 		d7Resume[i] = unCapteur.d7Resume[i];
 	}
-	
-	// Utilisation de la surcharge de = pour Vecteur
-	d1Contenu = unCapteur.d1Contenu;
-	d2Contenu = unCapteur.d2Contenu;
-	d3Contenu = unCapteur.d3Contenu;
-	d4Contenu = unCapteur.d4Contenu;
-	d5Contenu = unCapteur.d5Contenu;
-	d6Contenu = unCapteur.d6Contenu;
-	d7Contenu = unCapteur.d7Contenu;
+
+	for (int m = 0; m < MIN_PAR_SEMAINE; m++)
+	{
+		for (int j = 0; j < NB_STATS; j++)
+		{
+			semaineResume[m][j] = unCapteur.semaineResume[m][j];
+		}
+	}
 
 } //----- Fin de Capteur (constructeur de copie)
 
-Capteur::Capteur( int id ) :
-	d1Contenu(), d2Contenu(), d3Contenu(), d4Contenu(), d5Contenu(), d6Contenu(), d7Contenu(),
-	identifiant(id)
+Capteur::Capteur( int id ) : identifiant( id )
 {
 #ifdef MAP
 	cout << "Appel au constructeur de <Capteur>" << endl;
@@ -436,6 +330,14 @@ Capteur::Capteur( int id ) :
 		d1Resume[i] = 0;
 		d1Resume[i] = 0;
 		d1Resume[i] = 0;
+	}
+
+	for (int m = 0; m < MIN_PAR_SEMAINE; m++)
+	{
+		for (int s = 0; s < NB_STATS; s++)
+		{
+			semaineResume[m][s] = 0;
+		}
 	}
 
 } //----- Fin de Capteur

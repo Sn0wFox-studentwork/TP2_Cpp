@@ -17,8 +17,6 @@
 
 const int NB_PREMIER_BASE = 2239;
 const int NB_MAX_CAPTEURS = 1500;
-const int NB_MIN_PAR_SEMAINE = JOUR_PAR_SEMAINE * HEURE_PAR_JOUR * MIN_PAR_HEURE;
-const int NB_STATS = 4;
 
 //------------------------------------------------------------------ Types
 
@@ -48,7 +46,6 @@ public:
 	void TempsParcours( int d7, int hDebut, int hFin, Vecteur<int>& idSegments );
 	// Affiche l'heure de depart et le temps de parcours minimal pour parcourir idSegments entre tdebut et tfin au jour d7 de la semaine
 	// Passage par référence pour aller + vite
-	// TODO: heures de debut et de fin comprises ou pas ?
 
 	void AjouterEvenement( int id, Evenement& evenement );
 	// Ajoute un evenement à l'un des capteurs de la ville,
@@ -104,7 +101,7 @@ protected:
 TableHachage tableDeHachage;
 int nombreCapteurs;
 Vecteur<int> listeId;
-int semaineResume[NB_MIN_PAR_SEMAINE][NB_STATS];
+int semaineResume[MIN_PAR_SEMAINE][NB_STATS];
 /* NB : Structure de semaineResume :
 	0 : nombre de V
 	1 : nombre de J

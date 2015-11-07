@@ -13,6 +13,10 @@
 #include "Temps.h"
 
 //------------------------------------------------------------- Constantes
+const int TEMPS_PARCOURS_V = 1;
+const int TEMPS_PARCOURS_J = 2;
+const int TEMPS_PARCOURS_R = 4;
+const int TEMPS_PARCOURS_N = 10;
 
 //------------------------------------------------------------------ Types
 

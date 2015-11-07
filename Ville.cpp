@@ -131,54 +131,33 @@ void Ville::EmbouteillageJour( int d7 )
 //		 à adapter pour Capteur::TempsSgement2
 void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegments )
 // Algorithme :
-// Complexite : O(nbH*nbSegments*60*nbEvent)... Le seul sur lequel on peut jouer est nbEvent
-// TODO: pour le moment , non-prise en compte des endroits sans données
+// Complexite : O(nbH*nbSegments)
 {
 	// Création variables pour affichage et variables pratiques
-	int temps;
-	int meilleurTemps;
-	int meilleureMinute;
-	int meilleureHeure;
-	int meilleurJour;
+	int temps = 0;
+	int tempsAdditionnel = 0;
+	int meilleurTemps = 0;
+	int meilleureMinute = 0;
+	int meilleureHeure = 0;
 	int nombreMinutes = (hFin - hDebut + 1) * 60;
-	int heureActuelle = hDebut;
+	int heureActuelle = hDebut;		// Les trois dernières variables permettent de parcourir correctement la boucle
 	int minuteActuelle = 0;
 	int jourActuel = d7;
-	//Vecteur<Capteur*> capteursSegment;
 
-	// Init variables
-	temps = 0;
-	meilleurTemps = 0;
-	meilleureHeure = 0;
-	meilleureMinute = 0;
-/*
-	// Prise une fois pour toutes des capteurs qui nous intéressent
-	for ( int i = 0; i < idSegments.GetTaille(); i++ )
-	{
-		for ( int j = 0; j < nombreCapteurs; j++ )
-		{
-			if ( capteurs[j]->GetID() == idSegments[i] )
-			{
-				capteursSegment.insererFin(capteurs[j]);
-				break;
-			}
-		}
-	}
-*/
 	// Recherche du meilleur temps
 	for ( int heure = hDebut; heure <= hFin; heure++ )
 	{
-		for ( int minute = 0; minute < 60; minute++ )
+		for ( int minute = 0; minute < MIN_PAR_HEURE; minute++ )
 		{
 
-			temps = 0;	// Remise à jour pour calcul du temps lors du départ à heure:minuteActuelle
+			temps = 0;	// Remise à jour pour calcul du temps lors du départ à heureActuelle:minuteActuelle
 			minuteActuelle = minute;
 			heureActuelle = heure;
 			for (int i = 0; i < idSegments.GetTaille(); i++)
 			{
-				int tempsAdditionnel = (*this)[idSegments[i]].TempsSegment(jourActuel, heureActuelle, minuteActuelle);
+				tempsAdditionnel = (*this)[idSegments[i]].TempsSegment(jourActuel, heureActuelle, minuteActuelle);
 				temps += tempsAdditionnel;
-				minuteActuelle += tempsAdditionnel;
+				minuteActuelle += ( (int)tempsAdditionnel + 1 );
 				if ( minuteActuelle >= 60 )
 				{
 					heureActuelle++;
@@ -216,9 +195,7 @@ void Ville::AjouterEvenement( int id, Evenement& evenement )
 {
 
     Capteur* capteur = nullptr;
-	cout << capteur << ends;
     capteur = tableDeHachage.GetCapteur(id);
-	cout << capteur << endl;
 
     if ( capteur != nullptr )
     {
@@ -249,7 +226,6 @@ void Ville::AjouterEvenement( int id, Evenement& evenement )
 		break;
 	}
 
-	cout << numMinute << endl;
 	semaineResume[numMinute][posStat]++;
 
 } //----- Fin de AjouterEvenement
@@ -262,6 +238,14 @@ Ville &Ville::operator = ( const Ville &uneVille )
 	for (int i = 0; i < nombreCapteurs; i++)
 	{
 		tableDeHachage[listeId[i]] = new Capteur(*uneVille.tableDeHachage[listeId[i]]);
+	}
+
+	for (int minute = 0; minute < MIN_PAR_SEMAINE; minute++)
+	{
+		for (int numStat = 0; numStat < NB_STATS; numStat++)
+		{
+			semaineResume[minute][numStat] = uneVille.semaineResume[minute][numStat];
+		}
 	}
 
 	return *this;
@@ -294,6 +278,14 @@ Ville::Ville ( const Ville &uneVille ) :	tableDeHachage( uneVille.tableDeHachage
 	cout << "Appel au constructeur de copie de <Ville>" << endl;
 #endif
 
+	for (int minute = 0; minute < MIN_PAR_SEMAINE; minute++)
+	{
+		for (int numStat = 0; numStat < NB_STATS; numStat++)
+		{
+			semaineResume[minute][numStat] = uneVille.semaineResume[minute][numStat];
+		}
+	}
+
 } //----- Fin de Ville (constructeur de copie)
 
 
@@ -307,7 +299,7 @@ Ville::Ville () :	tableDeHachage( NB_MAX_CAPTEURS, NB_PREMIER_BASE ),
 #endif
 
 	// Initialisation du résumé hebdomadaire
-	for (int minute = 0; minute < NB_MIN_PAR_SEMAINE; minute++)
+	for (int minute = 0; minute < MIN_PAR_SEMAINE; minute++)
 	{
 		for (int numStat = 0; numStat < NB_STATS; numStat++)
 		{
