@@ -18,33 +18,30 @@ using namespace std;
 
 //------------------------------------------------------ Include personnel
 #include "Ville.h"
-#include "Bench.h"
 
-//------------------------------------------------------------- Constantes
-typedef Evenement Evenement;
-typedef Temps Temps;
+//----------------------------------------------------------- Types privés
 typedef Vecteur<int> Vint;
 
+
 int main(int argc, char* argv[])
-// Algorithme :
+// Algorithme :	On lit mot à mot ce qui arrive par l'entrée du programme et on le stocke dans une
+//				variable de type string.
+//				Tant qu'on ne lit pas la commande "EXIT", on lit en boucle jusqu'à tomber sur l'une
+//				des en-têtes de commandes utilisables dans cette application (ADD, NB_STATS_C, NB_STATS_D7,
+//				JAM_DH, OPT).
+//				Lorsqu'on arrive sur l'une d'entre elle, on suppose que l'utilisateur va envoyer par la suite
+//				les bons paramètres permettant d'exécuter une méthode affichant les statistiques voulues,
+//				ajoutant un Evenement ou calculant un instant de départ optimal.
+//				En effet, nous sommes en présence d'une application fonctionnant par saisie formatée. Il est donc
+//				du devoir de l'utilisateur de ne pas envoyer des commandes érronées.
+//				Lorsquela commande rentrée est correcte, on l'exécute puis on continu à lire pour arriver à une
+//				nouvelle commande.
+//				L'application se ferme lorsqu'on arrive sur la commande "EXIT".
 {
+
 	Ville v;
 	
-	// Bancs d'essais: (de la forme bench(&Classe::fonction, objet, param1, ... , paramN, nombreRepetitions), N de 0 à 4)
-	
-	/*for (int i = 0; i < 500; i++)
-	{
-		Evenement e;
-		Temps t(i%7 +1, 1586 + i, 5, 2, i%24, i%60);
-		if (i % 8 == 0) { Evenement ev(V, t); e = ev; }
-		else if (i % 8 == 1) { Evenement ev(J, t); e = ev; }
-		else if (i % 7 == 2) { Evenement ev(R, t); e = ev; }
-		else { Evenement ev(N, t); e = ev; }
-
-		v.AjouterEvenement(i%5, e);
-		
-	}*/
-	
+	v.AjouterEvenement(10011, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));	// Collision avec l'ID 4
 	v.AjouterEvenement(2, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));
 	v.AjouterEvenement(2, Evenement(R, Temps(5, 1586, 5, 2, 5, 6)));
 	v.AjouterEvenement(2, Evenement(N, Temps(5, 1586, 5, 2, 5, 7)));
@@ -58,6 +55,14 @@ int main(int argc, char* argv[])
 	v.AjouterEvenement(4, Evenement(N, Temps(5, 1586, 5, 2, 5, 7)));
 	v.AjouterEvenement(4, Evenement(V, Temps(5, 1586, 5, 2, 6, 8)));
 
+	for (int i = 0; i < 1400000; i+=1000)
+	{
+		v.AjouterEvenement(i, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));
+	}
+
+	cout << v[1121000].GetSuivant( ) << endl;
+	cout << v[4].GetSuivant( )->GetID() << endl;
+
 	cout << v[4].TempsSegment(5, 5, 6) << endl;
 	v.StatsJour(5);
 
@@ -69,11 +74,6 @@ int main(int argc, char* argv[])
 	s.insererFin(1);
 
 	v.TempsParcours(5, 0, 23, s);
-
-	//bench(&Capteur::TempsSegment, v[2], 5, 6, 6, 1000000);
-	//bench(&Ville::StatsJour, v, 5, 100);
-	//bench(&Ville::AjouterEvenement, v, 55, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)), 20000000);
-	//bench(&Ville::TempsParcours, v, 5, 0, 23, s, 100);*/
 
 	string lecture;
 	cin >> lecture;

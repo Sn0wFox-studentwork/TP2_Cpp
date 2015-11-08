@@ -18,26 +18,25 @@ using namespace std;
 #include "Capteur.h"
 
 //------------------------------------------------------------- Constantes
-
-//---------------------------------------------------- Variables de classe
-
-//----------------------------------------------------------- Types privés
-
+//#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
 
 //----------------------------------------------------------------- PUBLIC
-//-------------------------------------------------------- Fonctions amies
 
 //----------------------------------------------------- Méthodes publiques
 
-void Capteur::Inserer( Evenement& unEvenement )
-// Algorithme :
+void Capteur::Inserer ( Evenement& unEvenement )
+// Algorithme :	On détermine quel tableau de semaineResume incrémenter en se basant sur le jour, l'heure et la minute
+//				de unEvenement.
+//				On détermine quelle tableau de résumé journalié modifier grâce au jour de unEvenement.
+//				On incrémente la bonne case de chacun des deux tableaux déterminés précédement grâce au Trafic
+//				de unEvenement, sans oublier la case représentant le nombre total d'Evenement (4) pour un jour donné.
 // Complexité : O(1)
 {
 	// Variables permettant de positionner l'insertion
 	int indice = ( (unEvenement.GetD7( ) - 1) * HEURE_PAR_JOUR + unEvenement.GetHeure( ) ) * MIN_PAR_HEURE + unEvenement.GetMinute( );
 	int * jourTab = nullptr;
 
-	// Détermination de la branche dans laquelle prendre les données
+	// Détermination du tableau de résumé journalié dans lequel prendre les données
 	switch ( unEvenement.GetD7( ) )
 	{
 	case 1:
@@ -88,14 +87,19 @@ void Capteur::Inserer( Evenement& unEvenement )
 
 	} //----- Fin de switch ( unEvenement.GetTrafic() )
 
-	// Incrémentation du total
+	// Incrémentation du nombre total d'Evenement
 	jourTab[4]++;
 
 } //----- Fin de Inserer
 
 Vecteur<double> Capteur::StatsPropres()
-// Algorithme :
-// Complexité : O(1), avec un for de taille 4
+// Algorithme :	On calcul le total d'Evenement que le Capteur courant a enregistré en sommant les valeurs
+//				des cases d'indice 4 des résumés journaliés.
+//				Si ce total est différent de 0, on divise alors le nombre d'occurence de chaque état du trafic
+//				(V, J, R ou N) par ce total, et on l'insère dans la structure de retour statsRetour.
+//				On retourne le Vecteur<double> de taille 4 statsRetour qui contient les statistiques
+//				comprise entre 0 et 1 (0 partout si le total vaut 0).
+// Complexité : O(1)
 {
 	// Creation de la structure de retour et variables pratiques
 	Vecteur<double> statsRetour;
@@ -104,7 +108,7 @@ Vecteur<double> Capteur::StatsPropres()
 	double statTrafic;
 
 	// Remplissage
-	for (int i = 0; i < TAILLE_RESUME - 1; i++)
+	for ( int i = 0; i < TAILLE_RESUME - 1; i++ )
 	{
 		if ( total != 0 )
 		{
@@ -122,109 +126,16 @@ Vecteur<double> Capteur::StatsPropres()
 
 } //----- Fin de StatsPropres
 
-Vecteur<double> Capteur::StatsJour( int d7 )
-// Algorithme :
-// Complexité : O(1), avec un switch et un for de taille 4
-{
-	// Création structure de retour et variables pratiques
-	Vecteur<double> statsRetour;
-	int * jourTab = nullptr;
-	double total;
-
-	// Détermination de la branche dans laquelle prendre les données
-	switch ( d7 )
-	{
-	case 1:
-		jourTab = d1Resume;
-		break;
-	case 2:
-		jourTab = d2Resume;
-		break;
-	case 3:
-		jourTab = d3Resume;
-		break;
-	case 4:
-		jourTab = d4Resume;
-		break;
-	case 5:
-		jourTab = d5Resume;
-		break;
-	case 6:
-		jourTab = d6Resume;
-		break;
-	case 7:
-		jourTab = d7Resume;
-		break;
-	default:
-		// Erreur : mauvaise demande de jour
-		break;
-	}  //----- Fin de switch ( d7 )
-
-	total = jourTab[4];
-
-	// Insertion dans la structure de retour
-	for ( int i = 0; i < TAILLE_RESUME - 1; i++ )
-	{
-		statsRetour.insererFin( jourTab[i] / total );
-	}
-
-	return statsRetour;
-
-} //----- Fin de StatsJour
-
-Vecteur<int> Capteur::DonneesJour( int d7 )
-// Algorithme :
-// Complexité : O(1), avec un switch et for de taille 5
-{
-	// Création structure de retour et variables pratiques
-	Vecteur<int> donneesRetour;
-	int * jourTab = nullptr;
-
-	// Détermination de la branche dans laquelle prendre les données
-	switch ( d7 )
-	{
-	case 1:
-		jourTab = d1Resume;
-		break;
-	case 2:
-		jourTab = d2Resume;
-		break;
-	case 3:
-		jourTab = d3Resume;
-		break;
-	case 4:
-		jourTab = d4Resume;
-		break;
-	case 5:
-		jourTab = d5Resume;
-		break;
-	case 6:
-		jourTab = d6Resume;
-		break;
-	case 7:
-		jourTab = d7Resume;
-		break;
-	default:
-		// Erreur : mauvaise demande de jour
-		break;
-	}  //----- Fin de switch ( d7 )
-
-	// Insertion dans la structure de retour
-	for ( int i = 0; i < TAILLE_RESUME; i++ )
-	{
-		donneesRetour.insererFin( jourTab[i] );
-	}
-
-	return donneesRetour;
-
-}  //----- Fin de DonneesJour
-
 int Capteur::TempsSegment ( int d7, int heure, int minute )
-// Algorithme :
+// Algorithme :	On detérmine dans quelle case prendre les données en se basant sur la construction même
+//				de la structure semaineResume.
+//				On détermine quel Trafic est le plus probable en prenant celui qui est apparu le plus grand
+//				nombre de fois. En cas d'égalité, c'est le trafic le plus perturbé qui sera comptabilisé.
+//				Ceci implique que les INSTANTS SANS DONNES seront compté comme ayant un Trafic NOIR (N).
+//				On retourne le temps de parcours le plus probable défini en fonction de la valeur du Trafic précédent.
 // Complexité : O(1)
-// TODO: les endroits sans données comptes comme des N pour le moment
 {
-	// Création variable de retour et variables pratiques
+	// Création variables pratiques
 	int nombreTrafic = 0;
 	int traficLePlusProbable = 0;
 	int indice = ((d7 - 1) * HEURE_PAR_JOUR + heure) * MIN_PAR_HEURE + minute;
@@ -232,11 +143,12 @@ int Capteur::TempsSegment ( int d7, int heure, int minute )
 	for ( int i = 0; i < NB_STATS; i++ )
 	{
 		if ( semaineResume[indice][i] >= nombreTrafic )	// >= fait prendre le trafic avec le plus long temps de parcours en cas d'égalité
-		{												// ceci se traduit par un trafic N pour les endroits sans données
+		{												// ceci se traduit par un trafic N pour les endroits sans données (égalité avec 0 partout)
 			nombreTrafic = semaineResume[indice][i];
 			traficLePlusProbable = i;
 		}
 	}
+
 	// Retour du temps de parcours le plus probable
 	switch ( traficLePlusProbable )
 	{
@@ -254,10 +166,10 @@ int Capteur::TempsSegment ( int d7, int heure, int minute )
 
 //------------------------------------------------- Surcharge d'opérateurs
 Capteur &Capteur::operator = ( const Capteur &unCapteur )
-// Algorithme :		Si on n'est pas en train de faire unCapteur = unCapteur,
-//					on "copie" tout les champs :
-//					on les modifie pour qu'ils soient comme ceux de unCapteur.
-//					On retourne *this pour la bonne marche de la surcharge d'operateur.
+// Algorithme :	Si on n'est pas en train de faire unCapteur = unCapteur,
+//				on "copie" tout les champs :
+//				on les modifie pour qu'ils soient comme ceux de unCapteur.
+//				On retourne *this pour la bonne marche de la surcharge d'operateur.
 {
 	identifiant = unCapteur.identifiant;
 
@@ -285,15 +197,18 @@ Capteur &Capteur::operator = ( const Capteur &unCapteur )
 } //----- Fin de operator =
 
 
-  //-------------------------------------------- Constructeurs - destructeur
-Capteur::Capteur ( const Capteur &unCapteur )
+//-------------------------------------------- Constructeurs - destructeur
+Capteur::Capteur ( const Capteur &unCapteur ) : identifiant( unCapteur.identifiant ), suivant( unCapteur.suivant )
+// Algorithme :	Initialisation des attributs à partir de ceux de unCapteur,
+//				puis recopie des données des dXResume et semaineResume à partir de celles de unCapteur.
+//				Attention, on se retrouve alors avec deux capteurs ayant le même identifiant.
+//				Etant donné la manière dont sont gérés les id (à cause du cahier des charges qui force à
+//				faire confiance à l'utilisateur sur l'id lors de l'insertion de données), ce n'est pas grave.
 {
 #ifdef MAP
 	cout << "Appel au constructeur de copie de <Capteur>" << endl;
 #endif
 	
-	identifiant = unCapteur.identifiant;
-
 	for ( int i = 0; i < TAILLE_RESUME; i++ )
 	{
 		d1Resume[i] = unCapteur.d1Resume[i];
@@ -315,7 +230,10 @@ Capteur::Capteur ( const Capteur &unCapteur )
 
 } //----- Fin de Capteur (constructeur de copie)
 
-Capteur::Capteur( int id ) : identifiant( id )
+Capteur::Capteur( int id ) : identifiant( id ), suivant(nullptr)
+// Algorithme :	Construit une instance de Capteur, d'idendifiant id.
+//				Le pointeur suivant est initialisé comme un nullptr (ne pointe vers rien).
+//				On initialise ensuite toutes les statistiques à 0 pour éviter des comportements indéfinis.
 {
 #ifdef MAP
 	cout << "Appel au constructeur de <Capteur>" << endl;
@@ -344,19 +262,17 @@ Capteur::Capteur( int id ) : identifiant( id )
 
 
 Capteur::~Capteur ()
-// Algorithme :
+// Algorithme :	Détruit une instance de Capteur et libère la mémoire occupée par le pointeur suivant
+//				(ne pose pas de problème si le pointeur est null).
+//				TODO: (?) Ceci appel donc le destructeur pour le Capteur pointé par suivant qui fonctionne
+//				de la même manière. Ce destructeur détruit donc toute la liste chaînée éventuelle présente
+//				dans une case d'une TableHachage, de manière récursive.
+//				Ceci ne pose pas de problème ici puisque les destructeurs ne seront appelés qu'à la fin de l'application.
 {
 #ifdef MAP
 	cout << "Appel au destructeur de <Capteur>" << endl;
 #endif
 
-	// Pas d'allocation dynamique ici
+	delete suivant;		// Sinon, personne ne détruit les membres de la liste chaînée de TableHachage
 
 } //----- Fin de ~Capteur
-
-
-//------------------------------------------------------------------ PRIVE
-
-//----------------------------------------------------- Méthodes protégées
-
-//------------------------------------------------------- Méthodes privées

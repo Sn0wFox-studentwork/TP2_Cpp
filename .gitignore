@@ -6,3 +6,5 @@ TP_CPP_2.vcxproj
 TP_CPP_2.vcxproj.filters
 *.idb
 Debug/vc140.pdb
+Bench.h
+Bench.h

@@ -1,13 +1,16 @@
 /*************************************************************************
-${file_base}  -  description
+					TableHachage  -  description
 -------------------
-début                : ${date}
-copyright            : (C) ${year} par ${user}
+début                : 19/10/2015
+copyright            : (C) 2015 par Pericas-Belletier
 *************************************************************************/
 
-//---------- Réalisation de la classe <${file_base}> (fichier ${file_name}) --
+//---------- Réalisation de la classe <TableHachage> (fichier TableHachage.cpp) --
 
 //---------------------------------------------------------------- INCLUDE
+using namespace std;
+#include <iostream>
+#include <cstddef>		// Utilisation de nullptr
 
 //-------------------------------------------------------- Include système
 
@@ -15,71 +18,92 @@ copyright            : (C) ${year} par ${user}
 #include "TableHachage.h"
 
 //------------------------------------------------------------- Constantes
-
-//---------------------------------------------------- Variables de classe
-
-//----------------------------------------------------------- Types privés
-
+//#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
 
 //----------------------------------------------------------------- PUBLIC
-//-------------------------------------------------------- Fonctions amies
 
 //----------------------------------------------------- Méthodes publiques
-// type ${file_base}::Méthode ( liste de paramètres )
-	// Algorithme :
-	//
-	//{
-	//} //----- Fin de Méthode
 
-int TableHachage::Hacher ( Capteur * capteur )
+int TableHachage::Hacher ( Capteur * capteur ) const
+// Algorithme :	Retroune Hacher( int ) avec l'identifiant du Capteur pointé par capteur en paramètre.
 {
 	return Hacher( capteur->GetID( ) );
 
 } //----- Fin de Hacher ( Capteur* )
 
-int TableHachage::Hacher ( int idCapteur )
+int TableHachage::Hacher ( int idCapteur ) const
+// Algorithme :	Retourne une clef générée avec une fonction de hachage basique.
+//				Cette clef est générée en faisant l'identifiant idCapteur modulo avec un nombre premier
+//				(strictement supérieur à la taille maximale de la table si on veut que ça soit utile)
+//				puis modulo la taille du tableau pour faire en sorte que la clef soit l'indice d'une
+//				case du tableau. Permet alors un accès en O(1), sauf collisions.
+//				Le nombre premier permet d'éviter toutes les collisions liées au multiples.
 {
 	return ( idCapteur % nombrePremier) % tailleTable;
 
 } //----- Fin de Hacher ( int )
 
 void TableHachage::Inserer ( Capteur * capteur )
+// Algorithme :	On génère la clef à partir du Capteur* capteur.
+//				S'il s'avère que cette case du tableau table n'est pas occupée, on fait seulement
+//				pointer le pointeur de cette cas vers la même chose que capteur.
+//				Sinon, il y a collision. On traite les collisions par liste chaînée avec insertion en queue :
+//				tant que le pointeur suivant du Capteur pointé par le Capteur* c n'est pas null,
+//				on avance dans la liste chaînée. Dès qu'on est arrivé au bout de la liste (i.e. suivant == nullptr),
+//				on fait pointer suivant vers capteur.
+// NB :	Le SI et le SINON sont inversés entre la description et l'implémentation, mais il était plus simple de faire
+//		dans ce sens pour les deux.
 {
-	int indice = Hacher( capteur );
-	Capteur* c = table[indice];
-	Capteur* cPrecedent = nullptr;
+	// Création de variables pratiques
+	int indice = Hacher( capteur );		// Génération de la clef
+		// Pour traiter les collisions :
+	Capteur* c = table[indice];			// Capteur courant
+	Capteur* cPrecedent = nullptr;		// Capteur précédent le courant
+
+	// Tant qu'il y a collision, on avance dans la liste chaînée
 	while ( c != nullptr )
 	{
 		cPrecedent = c;
-		//c = c->getNext( );
+		c = c->GetSuivant( );
 	}
 	
+	// Si collision
 	if ( cPrecedent )
 	{
-		//c->setNext( capteur );
+#ifdef MAP
+		cout << "Collision !" << cPrecedent->GetID() << endl;
+#endif
+		cPrecedent->SetSuivant( capteur );	// Insertion en queue
 	}
+	// Sinon
 	else
 	{
-		table[indice] = capteur;
+		table[indice] = capteur;			// Insertion dans la première case
 	}
-	
 
 }  //----- Fin de Inserer
 
-Capteur * TableHachage::GetCapteur ( int idCapteur )
+Capteur * TableHachage::GetCapteur ( int idCapteur ) const
+// Algorithme :	Retourne le capteur d'identifiant idCapteur présent à l'indice généré par son identifiant idCapteur.
+//				Pour être certain de retourner le bon Capteur et non pas un autre membre de la liste chaînée,
+//				on parcours la liste et on retourne le premier dont l'identifiant correspond (donc en cas de doublons, le prmier aussi).
+//				Si le Capteur d'identifiant idCapteur n'existe pas dans la TableHachage courante,
+//				on retourne un pointeur null nullptr.
 {
+	// Création et initialisation de la variable de retour
 	Capteur* capteur = nullptr;
 	capteur = table[Hacher( idCapteur )];
 
+	// Vérification de l'identifiant
 	while ( capteur != nullptr )
 	{
 		if ( capteur->GetID( ) == idCapteur )
 		{
-			return capteur;
+			return capteur;		// Retour du premier capteur donc l'identifiant correspond
 		}
 		else
 		{
-			// capteur = capteur->getNext( );
+			capteur = capteur->GetSuivant( );
 		}
 	}
 
@@ -91,10 +115,10 @@ Capteur * TableHachage::GetCapteur ( int idCapteur )
 
 //------------------------------------------------- Surcharge d'opérateurs
 TableHachage & TableHachage::operator= ( const TableHachage & uneTableHachage )
-// Algorithme :		Si on n'est pas en train de faire uneTableHachage = uneTableHachage,
-//					on "copie" tout les champs :
-//					on les modifie pour qu'ils soient comme ceux de uneTableHachage.
-//					On retourne *this pour la bonne marche de la surcharge d'operateur.
+// Algorithme :	Si on n'est pas en train de faire uneTableHachage = uneTableHachage,
+//				on "copie" tout les champs :
+//				on les modifie pour qu'ils soient comme ceux de uneTableHachage.
+//				On retourne *this pour la bonne marche de la surcharge d'operateur.
 {
 	if ( this != &uneTableHachage )
 	{
@@ -112,12 +136,20 @@ TableHachage & TableHachage::operator= ( const TableHachage & uneTableHachage )
 
 } //----- Fin de operator=
 
-Capteur *& TableHachage::operator[]( int index )
+Capteur *& TableHachage::operator[] ( int index )
+// Algorithme :	Retourne un pointeur vers le premier Capteur présent dans table à l'indice index,
+//				sous forme d'une référence non-constante (opérande de gauche).
+//				Attention, pas de vérification de l'intégrité du pointeur retourné (nullptr ou non).
+//				Grâce à l'initialisation de la table, ce pointeur ne pourra pas pointer vers une zone mémoire protégée.
 {
 	return table[index];
 }
 
-Capteur *& TableHachage::operator[]( int index ) const
+Capteur *& TableHachage::operator[] ( int index ) const
+// Algorithme :	Retourne un pointeur vers le premier Capteur présent dans table à l'indice index,
+//				sous forme d'une référence constante (opérande de droite uniquement).
+//				Attention, pas de vérification de l'intégrité du pointeur retourné (nullptr ou non).
+//				Grâce à l'initialisation de la table, ce pointeur ne pourra pas pointer vers une zone mémoire protégée.
 {
 	return table[index];
 }
@@ -126,23 +158,42 @@ Capteur *& TableHachage::operator[]( int index ) const
 TableHachage::TableHachage( const TableHachage & uneTableHachage ) :
 	tailleTable(uneTableHachage.tailleTable),
 	nombrePremier(uneTableHachage.nombrePremier)
+// Algorithme :	Initialisation des attributs à partir de ceux de uneTableHachage,
+//				puis recopie des données de table à partir de celles de uneTableHachage.
+//				Allocation dynamique pour la nouvelle table. Tant qu'il y a collision dans
+//				uneTableDeHachage, on continue à générer dynamiquement de nouveaux capteurs
+//				à partir de ce de uneTableDeHachage à à les insérer dans la nouvelle liste chaînée.
 {
 #ifdef MAP
-	cout << "Appel au constructeur de copie de <${file_base}>" << endl;
+	cout << "Appel au constructeur de copie de <TableHachage>" << endl;
 #endif
 
 	table = new Capteur*[tailleTable];
+	Capteur* c = nullptr;
+	Capteur* cUneTableDeHachage = nullptr;
 	for ( int i = 0; i < tailleTable; i++ )
 	{
-		table[i] = uneTableHachage.table[i];
+		table[i] = new Capteur( *uneTableHachage.table[i] );
+
+		// Recopie des collisions
+		c = table[i];
+		cUneTableDeHachage = uneTableHachage.table[i]->GetSuivant( );
+		while ( cUneTableDeHachage != nullptr )
+		{
+			c->SetSuivant( cUneTableDeHachage );
+			c = c->GetSuivant( );
+			cUneTableDeHachage = cUneTableDeHachage->GetSuivant( );
+		}
 	}
-} //----- Fin de ${file_base} (constructeur de copie)
+} //----- Fin de TableHachage (constructeur de copie)
 
 TableHachage::TableHachage ( int taille, int nbPremier ):
 	tailleTable( taille ), nombrePremier( nbPremier )
+// Algorithme :	Construit une instance de TableHachage,
+//				et initialise tout les pointeurs de table à nullptr pour éviter beaucoup de soucis par la suite.
 {
 #ifdef MAP
-	cout << "Appel au constructeur de <${file_base}>" << endl;
+	cout << "Appel au constructeur de <TableHachage>" << endl;
 #endif
 
 	table = new Capteur*[ tailleTable ];
@@ -151,21 +202,26 @@ TableHachage::TableHachage ( int taille, int nbPremier ):
 	{
 		table[i] = nullptr;
 	}
-} //----- Fin de ${file_base}
+} //----- Fin de TableHachage
 
 
 TableHachage::~TableHachage()
+// Algorithme :	Nous sommes en présence d'un tabeau alloué dynamiquement de pointeurs
+//				alloués dynamiquement.
+//				On détruit donc chaque élément du tableau table (qui grâce à l'appel du destructeur
+//				de Capteur va détruire la liste châinée),
+//				puis on détruit le tableau lui-même.
+//				Un simple delete[] table n'aurait pas libéré toute la mémoire.
 {
 #ifdef MAP
-	cout << "Appel au destructeur de <${file_base}>" << endl;
+	cout << "Appel au destructeur de <TableHachage>" << endl;
 #endif
 
+	for ( int i = 0; i < tailleTable; i++ )
+	{
+		delete table[i];
+	}
+
 	delete[] table;
-} //----- Fin de ~${file_base}
 
-
-//------------------------------------------------------------------ PRIVE
-
-//----------------------------------------------------- Méthodes protégées
-
-//------------------------------------------------------- Méthodes privées
+} //----- Fin de ~TableHachage

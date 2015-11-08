@@ -17,30 +17,23 @@ using namespace std;
 #include "Ville.h"
 
 //------------------------------------------------------------- Constantes
-
-//---------------------------------------------------- Variables de classe
-
-//----------------------------------------------------------- Types privés
-
+//#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
 
 //----------------------------------------------------------------- PUBLIC
-//-------------------------------------------------------- Fonctions amies
 
 //----------------------------------------------------- Méthodes publiques
-// type Ville::Méthode ( liste de paramètres )
-// Algorithme :
-//
-//{
-//} //----- Fin de Méthode
-
 
 void Ville::StatsJour( int d7 )
-// Algorithme :
-// Complexité : O(1) (1440 itérations à chaque fois)
-// A noter que l'affichage prend beacoup de temps!
+// Algorithme :	On somme le nombre d'apparitions de chaque valeur de trafic (V, J, R, N)
+//				sur chaque minute de la journée d7.
+//				On crée les 4 statistiques voulues à partir des 4 sommes précédentes en les
+//				divisant par le total (= la somme des 4 sommes) si celui-ci est différent de 0.
+//				On affiche les statistique en %.
+//
+// Complexité :	O(1) (1440 itérations à chaque fois)
 {
 	// Création structure pour affichage et variables pratiques
-	int total = 0;
+	int total = 0;		// Nombre total d'évènements
 	int nbVert = 0;
 	int nbJaune = 0;
 	int nbRouge = 0;
@@ -49,7 +42,8 @@ void Ville::StatsJour( int d7 )
 	int minuteMax = d7 * HEURE_PAR_JOUR * MIN_PAR_HEURE;
 	double stats[NB_STATS];
 
-	for (int minute = minuteInitiale; minute < minuteMax; minute++)
+	// Récupération du nombre total de chaque valeur de Trafic
+	for ( int minute = minuteInitiale; minute < minuteMax; minute++ )
 	{
 		nbVert += semaineResume[minute][0];
 		nbJaune += semaineResume[minute][1];
@@ -75,7 +69,7 @@ void Ville::StatsJour( int d7 )
 	}
 
 	// Affichage
-	cout << "V " << stats[0] * 100 << "%\r\n";	// TODO: quelle tronche a la fin de ligne ?
+	cout << "V " << stats[0] * 100 << "%\r\n";
 	cout << "J " << stats[1] * 100 << "%\r\n";
 	cout << "R " << stats[2] * 100 << "%\r\n";
 	cout << "N " << stats[3] * 100 << "%\r\n";
@@ -83,13 +77,19 @@ void Ville::StatsJour( int d7 )
 } //----- Fin de statsJour
 
 void Ville::EmbouteillageJour( int d7 )
-// Algorithme :
-// Complexité : O(1) (1440 itérations à chaque fois)
+// Algorithme :	On somme le nombre d'apparitions de chaque valeur de trafic (V, J, R, N)
+//				sur chaque minute pour chaque heure de la journée d7.
+//				On crée les 24 statistiques voulues à partir des 24 sommes précédentes en les
+//				divisant par le total de l'heure correspondante présent dans le tableau total
+//				(si ce total est différent de 0).
+//				On affiche les statistique en %.
+//				
+// Complexité :	O(1) (1440 itérations à chaque fois)
 {
 	// Création structure pour affichage et variables pratiques
-	int total[HEURE_PAR_JOUR];
-	int nbEmbouteillage[HEURE_PAR_JOUR];
-	double stats[HEURE_PAR_JOUR];
+	int total[HEURE_PAR_JOUR];						// Nombre total d'évènements par heure
+	int nbEmbouteillage[HEURE_PAR_JOUR];			// Nombre d'événements avec un Trafic R ou N
+	double stats[HEURE_PAR_JOUR];					// Tableau pour affichage
 	int heureInitiale = (d7 - 1) * HEURE_PAR_JOUR;
 	int heureMax = d7 * HEURE_PAR_JOUR;	
 
@@ -104,13 +104,16 @@ void Ville::EmbouteillageJour( int d7 )
 	// Prise des données
 	for (int h = heureInitiale; h < heureMax; h++)
 	{
-		for (int minute = 0; minute < MIN_PAR_HEURE; minute++)
+		for ( int minute = 0; minute < MIN_PAR_HEURE; minute++ )
 		{
+			// Trafic V ou J pour le total :
 			total[h - heureInitiale] += semaineResume[h * MIN_PAR_HEURE + minute][0];
 			total[h - heureInitiale] += semaineResume[h * MIN_PAR_HEURE + minute][1];
+			// Trafic R ou N pour les embouteillages :
 			nbEmbouteillage[h - heureInitiale] += semaineResume[h * MIN_PAR_HEURE + minute][2];
 			nbEmbouteillage[h - heureInitiale] += semaineResume[h * MIN_PAR_HEURE + minute][3];
 		}
+		// Pour le total, il faut ajouter aussi le nombre d'embouteillages :
 		total[h - heureInitiale] += nbEmbouteillage[h - heureInitiale];
 	}
 
@@ -122,25 +125,38 @@ void Ville::EmbouteillageJour( int d7 )
 			stats[i] = (double)nbEmbouteillage[i] / total[i];
 		}
 		// Affichage
-		cout << d7 << " " << i << " " << stats[i] * 100 << "%\r\n";		// TODO: quelle tronche a la fin de ligne ?
+		cout << d7 << " " << i << " " << stats[i] * 100 << "%\r\n";
 	}
 
 } //----- Fin de EmbouteillageJour
 
-// TODO: void Ville::TempsParcours2 ( int d7, int hDebut, int hFin, Vecteur<int>& idSegments )
-//		 à adapter pour Capteur::TempsSgement2
 void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegments )
-// Algorithme :
-// Complexite : O(nbH*nbSegments)
+// Algorithme :	Pour chaque minute de chaque heure de la plage horaire dédinie par hDebut et hFin
+//				(chacun de ces couples correspondant à un instant de départ), on calcul le temps
+//				de parcours total en additionnant le temps unitaire de parcours de chaque segment
+//				(via l'appel de la fonction TempsSegment(jour, heure, minute) de Capteur)
+//				LE PLUS PROBABLE. En cas d'égalité, c'est le trafic le plus emcombré qui est pris en compte.
+//				Il en résulte que les plages horaires sans données seront considérées comme ayant un trafic noir.
+//				Si le temps final est strictement inférieur au temps minimal actuel
+//				(ou que ce temps est actuellement nul), on remplace le meilleur temps par le temps actuel.
+//				Le temps de déplacement de chaque segment est pris en compte.
+//				Exemple :	départ à 00h00 du premier segment. Si il faut 4 minutes pour le traverser, on regarde
+//							alors combien de temps il faut pour traverser le segment 2 en partant de celui-ci à 00h04.
+//				Si le temps des premiers segments fait dépasser dimanche 23h59, on revient à lundi par un simple modulo.
+//				Il en va de même lorsqu'on dépasse 59 minutes ou 23h par heure/jour.
+//				On affiche le jour, l'heure et la minute de départ ainsi que le temps de trajet estimé.
+//				
+// Complexite : O(nbHeures*nbSegments)
 {
 	// Création variables pour affichage et variables pratiques
-	int temps = 0;
-	int tempsAdditionnel = 0;
-	int meilleurTemps = 0;
+	int temps = 0;				// Servira a calculer le temps de parcours courant
+	int tempsAdditionnel = 0;	// Temps unitaire de parcours, fonction du Trafic : V = 1min, J = 2min, R = 4min, N = 10min
+	int meilleurTemps = 0;		// Pour garder en mémoire l'actuel meilleur temps
 	int meilleureMinute = 0;
 	int meilleureHeure = 0;
 	int nombreMinutes = (hFin - hDebut + 1) * 60;
-	int heureActuelle = hDebut;		// Les trois dernières variables permettent de parcourir correctement la boucle
+		// Les trois dernières variables permettent de parcourir correctement la boucle :
+	int heureActuelle = hDebut;
 	int minuteActuelle = 0;
 	int jourActuel = d7;
 
@@ -158,6 +174,7 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 				tempsAdditionnel = (*this)[idSegments[i]].TempsSegment(jourActuel, heureActuelle, minuteActuelle);
 				temps += tempsAdditionnel;
 				minuteActuelle += ( (int)tempsAdditionnel + 1 );
+				// Lors d'un dépassement de jourActuel = 7, heureActuelle = 23 ou minuteActuelle = 60 :
 				if ( minuteActuelle >= 60 )
 				{
 					heureActuelle++;
@@ -185,29 +202,39 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 	} //----- Fin de for ( heure ) ; recherche du meilleur temps
 
 	// Affichage
-	cout << d7 << " " << meilleureHeure << " " << meilleureMinute << " " << meilleurTemps << "\r\n";	// TODO: quelle tronche a la fin de ligne ?
+	cout << d7 << " " << meilleureHeure << " " << meilleureMinute << " " << meilleurTemps << "\r\n";
 
 } //----- Fin de TempsParcours
 
 void Ville::AjouterEvenement( int id, Evenement& evenement )
-// Algorithme :
-// Complexité : O(1) Grace à la table de Hachage, s'il n'y a pas de collisions
+// Algorithme :	On tente d'accéder directement au capteur par son identifiant id dans la table de hachage.
+//				Si ce Capteur n'existe pas encore (i.e. on a un pointeur null), on crée le Capteur
+//				et on l'insère grâce à creerCapteur( id ).
+//				Lorsqu'on est sûr que le Capteur existe, on insère l'Evenement evenement grâce à
+//				la méthode Inserer( Evenement ) de Capteur.
+//				On incrémente ensuite la bonne case du tableau semaineResume (en fonction de l'heure, de la
+//				minute et du Trafic de l'Evenement evenement).
+//				
+// Complexité : O(1) Grace à la table de Hachage, s'il n'y a pas de collisions.
+//				O(n) dans le pire des cas, ce qui n'arrivera pas avec notre fonction de hash.
 {
-
+	// Création et initialisation des variables
     Capteur* capteur = nullptr;
-    capteur = tableDeHachage.GetCapteur(id);
+    capteur = tableDeHachage.GetCapteur( id );
 
+	// Insertion de l'Evenement
     if ( capteur != nullptr )
     {
         capteur->Inserer( evenement );
     }
     else	//si le capteur n'existe pas
     {
-        CreerCapteur( id );							//on le crée
+        creerCapteur( id );							//on le crée
         capteur = tableDeHachage.GetCapteur( id );	//on est donc sur qu'il existe maintenant
         capteur->Inserer( evenement );
     }
 
+	// Incrementation du tableau permettant de faire les statistiques semaineResume
 	int posStat = 0;
 	int numMinute = ( ( evenement.GetD7( ) - 1 ) * HEURE_PAR_JOUR + evenement.GetHeure( ) ) * MIN_PAR_HEURE + evenement.GetMinute( );
 	switch (evenement.GetTrafic( ))
@@ -232,14 +259,19 @@ void Ville::AjouterEvenement( int id, Evenement& evenement )
 
 //------------------------------------------------- Surcharge d'opérateurs
 Ville &Ville::operator = ( const Ville &uneVille )
-// Algorithme :
+// Algorithme :		Si on n'est pas en train de faire uneVille = uneVille,
+//					on "copie" tout les champs :
+//					on les modifie pour qu'ils soient comme ceux de uneVille.
+//					On retourne *this pour la bonne marche de la surcharge d'operateur.
 {
+	// Création de nouveaux capteurs à partir de ceux de uneVille
 	nombreCapteurs = uneVille.nombreCapteurs;
 	for (int i = 0; i < nombreCapteurs; i++)
 	{
 		tableDeHachage[listeId[i]] = new Capteur(*uneVille.tableDeHachage[listeId[i]]);
 	}
 
+	// Recopie des données de uneVille
 	for (int minute = 0; minute < MIN_PAR_SEMAINE; minute++)
 	{
 		for (int numStat = 0; numStat < NB_STATS; numStat++)
@@ -254,25 +286,32 @@ Ville &Ville::operator = ( const Ville &uneVille )
 
 
 Capteur& Ville::operator[] ( int idCapteur )
-// Algorithme :
-// Complexité : O(1) Grace à la table de Hachage
+// Algorithme : Retourne le capteur  d'identifiant idCapteur en se servant
+//				de la surcharge de [] de TableHachage.
+// Complexité : O(1) Grace à la table de Hachage, s'il n'y a pas de collisions.
+//				O(n) dans le pire des cas, ce qui n'arrivera pas avec notre fonction de hash.
 {
-	return *tableDeHachage[idCapteur];
+	return *tableDeHachage[tableDeHachage.Hacher( idCapteur)];
 
 } //----- Fin de operator []
 
 Capteur & Ville::operator[] ( int idCapteur ) const
-// Algorithme :
+// Algorithme : Retourne le capteur  d'identifiant idCapteur en se servant
+//				de la surcharge de [] de TableHachage.
+// Complexité : O(1) Grace à la table de Hachage, s'il n'y a pas de collisions.
+//				O(n) dans le pire des cas, ce qui n'arrivera pas avec notre fonction de hash.
 {
-	return *tableDeHachage[idCapteur];
+	return *tableDeHachage[tableDeHachage.Hacher( idCapteur )];
 
 } //----- Fin de operator [] const
 
 
 //-------------------------------------------- Constructeurs - destructeur
-Ville::Ville ( const Ville &uneVille ) :	tableDeHachage( uneVille.tableDeHachage ),
-											nombreCapteurs( uneVille.nombreCapteurs ), listeId( uneVille.listeId )
-// Algorithme :
+Ville::Ville ( const Ville &uneVille ) :
+	tableDeHachage( uneVille.tableDeHachage ),
+	nombreCapteurs( uneVille.nombreCapteurs ), listeId( uneVille.listeId )
+// Algorithme :	Initialisation des attributs à partir de ceux de uneVille,
+//				puis recopie des données de semaineResume à partir de celles de uneVille.
 {
 #ifdef MAP
 	cout << "Appel au constructeur de copie de <Ville>" << endl;
@@ -288,11 +327,13 @@ Ville::Ville ( const Ville &uneVille ) :	tableDeHachage( uneVille.tableDeHachage
 
 } //----- Fin de Ville (constructeur de copie)
 
-
-Ville::Ville () :	tableDeHachage( NB_MAX_CAPTEURS, NB_PREMIER_BASE ),
-					nombreCapteurs( NB_MAX_CAPTEURS ), listeId()
-// Algorithme :
-// NB: Il EST necessaire ici de faire une taille différente du nombre premier pour éviter les collisions
+Ville::Ville ( int nombreSegments, int nombrePremier ) :
+	tableDeHachage( nombreSegments * 5, nombrePremier ),
+	nombreCapteurs( NB_MAX_CAPTEURS ), listeId( )
+// Algorithme :	Construit une instance de Ville.
+//				Pour le bon fonctionnement de la table de hachage, il faut donner un nombre premier
+//				supérieur à la taille de la table, et une taille de table supérieure au nombre maximum
+//				d'éléments qu'on souhaite qu'elle contienne.
 {
 #ifdef MAP
 	cout << "Appel au constructeur de <Ville>" << endl;
@@ -311,7 +352,10 @@ Ville::Ville () :	tableDeHachage( NB_MAX_CAPTEURS, NB_PREMIER_BASE ),
 
 
 Ville::~Ville ()
-// Algorithme :
+// Algorithme :	Le destructeur de TableHacahe va être appelé pour tableDeHachage automatiquement.
+//				C'est ce dernier qui va se charger de libérer la mémoire pour tout les capteurs
+//				alloués dynamiquement.
+//				Rien de plus à faire ici donc.
 {
 #ifdef MAP
 	cout << "Appel au destructeur de <Ville>" << endl;
@@ -323,14 +367,13 @@ Ville::~Ville ()
 //------------------------------------------------------------------ PRIVE
 
 //----------------------------------------------------- Méthodes protégées
-void Ville::CreerCapteur( int id )
-// Algorithme : allocation dynamique d'un nouveau capteur et "insertion" dans le tableau
+void Ville::creerCapteur( int id )
+// Algorithme : Allocation dynamique d'un nouveau capteur et "insertion" dans la table de hachage.
+//				Insertion de l'identifiant dans la liste des identifiants.
+// NB:	On suppose que la vérification de l'existence du capteur a été traitée avant l'appel à cette fonction.
 {
-	// La verification de l'existence du capteur a été traitée avant l'appel à cette fonction
 	Capteur* capteur = new Capteur( id );
 	tableDeHachage.Inserer( capteur );
     listeId.insererFin( id );
 
 } //----- Fin de creerCapteur
-
-//------------------------------------------------------- Méthodes privées
