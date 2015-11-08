@@ -9,11 +9,22 @@ copyright            : (C) 2015 par Pericas-Belletier
 #if ! defined ( BENCH_H )
 #define BENCH_H
 
+//--------------------------------------------------- Interfaces utilisées
 #include <ctime>
 #include <iostream>
 using namespace std;
 
-// Version fonction generique :
+//------------------------------------------------------------------------
+// Rôle des fonctions <Bench>
+// Les fonctions Bench sont des fonctions génériques modèlisant un banc d'essais de fonctions.
+// Elles permettent de réaliser des test de performances en terme de rapidité,
+// pour n'importe quelle fonction membre ayant entre 0 et 4 paramètres.
+// Elles affiche toutes le temps d'exécution de X répétitions en secondes (format double).
+// Les passages de variables par patron de références permettent la détection automatique
+// par le compilateur des paramètres modèls à utiliser, qu'ils soient présent à la fois en tant
+// que valeur, valeur de pointeur ou référence.
+//------------------------------------------------------------------------
+
 template<class C, typename retour>
 void bench(retour(C::*pf)(), C objet, int repetitions)
 // Sans param
@@ -54,7 +65,7 @@ void bench(retour(C::*pf)(param1, param2 &), C objet, param1 p1, param2 & p2, in
 }
 
 template<class C, typename retour, typename param1, typename param2, typename param3>
-void bench(retour(C::*pf)(param1, param2, param3), C objet, param1 p1, param2 p2, param3 p3, int repetitions)
+void bench(retour(C::*pf)(param1, param2, param3), C& objet, param1 p1, param2 p2, param3 p3, int repetitions)
 // Avec trois param
 {
 	clock_t debut = clock();

@@ -18,7 +18,7 @@ const int NB_PREMIER_BASE = 10007;
 //------------------------------------------------------------------------ 
 // Rôle de la classe <TableHachage>
 // La classe TableHachage a été conçue spécialement pour implémenter une hashTable
-// permettant de stocker UNIQUMENT des pointeurs vers Capteurs. Ce n'est donc
+// permettant de stocker UNIQUEMENT des pointeurs vers Capteurs. Ce n'est donc
 // pas une classe générique (template).
 // Elle propose deux fonctions de hachage (sous forme de méthodes) qui permettent
 // de générer un clé à partir soit d'un identifiant, soit d'un pointeur vers Capteur
@@ -37,11 +37,11 @@ public:
 
 	int Hacher ( Capteur* capteur ) const;
 	// Mode d'emploi :	Retourne l'index de positionnnement associé au Capteur* capteur.
-	//					Cet index est le même que celui généré par l'appel à Hacher( capteur->GertID( ) ).
+	//					Cet index est le même que celui généré par l'appel à Hacher( capteur->GetID( ) ).
 	//					A noter que deux instances TableHachage n'ont pas forcément la même fonction de hachage.
 
 	int Hacher ( int idCapteur ) const;
-	// Mode d'emploi :	Retourne l'index de positionnnement associé au Capteur d'identifiant idCapteur.
+	// Mode d'emploi :	Retourne l'index de positionnement associé au Capteur d'identifiant idCapteur.
 	//					A noter que deux instances TableHachage n'ont pas forcément la même fonction de hachage.
 	// Contrat :		L'utilisateur s'engage à fournir un idCapteur positif.
 

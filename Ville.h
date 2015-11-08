@@ -59,15 +59,21 @@ public:
 	// Mode d'emploi :	Réaffecte l'instance courante pour la rendre en tout point similaire à uneVille.
 	//					Les deux villes auront les mêmes données, mais non partagées (copies).
 
-	Capteur& operator[] ( int idCapteur );
-	// Mode d'emploi :	Permet d'accéder au capteur d'identifiant idCapteur.
+	Capteur*& operator[] ( int idCapteur );
+	// Mode d'emploi :	Permet d'accéder au capteur d'identifiant idCapteur, via un pointeur.
 	//					Retourne une référence non-constante (opérande de gauche).
-	// Contrat :		L'utilisateur s'engage à fournir un identifiant idCapteur positif.
+	//					Attention, ce pointeur peut être un nullptr. Pas d'accés illégal en mémoire en revanche.
+	// Contrat :		L'utilisateur s'engage à vérifier l'intégrité du pointeur retourné (= si différent de nullptr)
+	//					avant d'appliquer des méthodes à l'objet pointé par le pointeur retourné,
+	//					et à fournir une valeur d'identifiant idCapteur positive.
 
-	Capteur& operator[] ( int idCapteur ) const;
-	// Mode d'emploi :	Permet d'accéder au capteur d'identifiant idCapteur.
+	Capteur*& operator[] ( int idCapteur ) const;
+	// Mode d'emploi :	Permet d'accéder au capteur d'identifiant idCapteur, via un pointeur.
 	//					Retourne une référence constante (pour opérande de droite uniquement donc).
-	// Contrat :		L'utilisateur s'engage à fournir un identifiant idCapteur positif.
+	//					Attention, ce pointeur peut être un nullptr. Pas d'accés illégal en mémoire en revanche.
+	// Contrat :		L'utilisateur s'engage à vérifier l'intégrité du pointeur retourné (= si différent de nullptr)
+	//					avant d'appliquer des méthodes à l'objet pointé par le pointeur retourné,
+	//					et à fournir une valeur d'identifiant idCapteur positive.
 
 //-------------------------------------------- Constructeurs - destructeur
 	Ville ( const Ville & unVille );

@@ -137,6 +137,7 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 //				(via l'appel de la fonction TempsSegment(jour, heure, minute) de Capteur)
 //				LE PLUS PROBABLE. En cas d'égalité, c'est le trafic le plus emcombré qui est pris en compte.
 //				Il en résulte que les plages horaires sans données seront considérées comme ayant un trafic noir.
+//				Dans le cas où le capteur n'existe pas, on revient au cas d'absence de données : trafic considéré noir.
 //				Si le temps final est strictement inférieur au temps minimal actuel
 //				(ou que ce temps est actuellement nul), on remplace le meilleur temps par le temps actuel.
 //				Le temps de déplacement de chaque segment est pris en compte.
@@ -171,9 +172,19 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 			heureActuelle = heure;
 			for (int i = 0; i < idSegments.GetTaille(); i++)
 			{
-				tempsAdditionnel = (*this)[idSegments[i]].TempsSegment(jourActuel, heureActuelle, minuteActuelle);
+				// Si le segment existe, on calcul le temps le plus probable de parcours :
+				if ( (*this)[idSegments[i]] )
+				{
+					tempsAdditionnel = (*this)[idSegments[i]]->TempsSegment(jourActuel, heureActuelle, minuteActuelle);
+				}
+				// Sinon, on considère que nous n'avons pas de données ; on prend donc le temps maximal :
+				else
+				{
+					tempsAdditionnel = TEMPS_PARCOURS_N;
+				}
+
 				temps += tempsAdditionnel;
-				minuteActuelle += ( (int)tempsAdditionnel + 1 );
+				minuteActuelle += tempsAdditionnel;
 				// Lors d'un dépassement de jourActuel = 7, heureActuelle = 23 ou minuteActuelle = 60 :
 				if ( minuteActuelle >= 60 )
 				{
@@ -285,23 +296,23 @@ Ville &Ville::operator = ( const Ville &uneVille )
 } //----- Fin de operator =
 
 
-Capteur& Ville::operator[] ( int idCapteur )
-// Algorithme : Retourne le capteur  d'identifiant idCapteur en se servant
+Capteur*& Ville::operator[] ( int idCapteur )
+// Algorithme : Retourne le capteur d'identifiant idCapteur en se servant
 //				de la surcharge de [] de TableHachage.
 // Complexité : O(1) Grace à la table de Hachage, s'il n'y a pas de collisions.
 //				O(n) dans le pire des cas, ce qui n'arrivera pas avec notre fonction de hash.
 {
-	return *tableDeHachage[tableDeHachage.Hacher( idCapteur)];
+	return tableDeHachage[tableDeHachage.Hacher( idCapteur)];
 
 } //----- Fin de operator []
 
-Capteur & Ville::operator[] ( int idCapteur ) const
-// Algorithme : Retourne le capteur  d'identifiant idCapteur en se servant
+Capteur*& Ville::operator[] ( int idCapteur ) const
+// Algorithme : Retourne le capteur d'identifiant idCapteur en se servant
 //				de la surcharge de [] de TableHachage.
 // Complexité : O(1) Grace à la table de Hachage, s'il n'y a pas de collisions.
 //				O(n) dans le pire des cas, ce qui n'arrivera pas avec notre fonction de hash.
 {
-	return *tableDeHachage[tableDeHachage.Hacher( idCapteur )];
+	return tableDeHachage[tableDeHachage.Hacher( idCapteur )];
 
 } //----- Fin de operator [] const
 

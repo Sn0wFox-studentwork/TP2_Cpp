@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 
 	Ville v;
 	
-	v.AjouterEvenement(10011, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));	// Collision avec l'ID 4
+	/*v.AjouterEvenement(10011, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));	// Collision avec l'ID 4
 	v.AjouterEvenement(2, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));
 	v.AjouterEvenement(2, Evenement(R, Temps(5, 1586, 5, 2, 5, 6)));
 	v.AjouterEvenement(2, Evenement(N, Temps(5, 1586, 5, 2, 5, 7)));
@@ -60,10 +60,10 @@ int main(int argc, char* argv[])
 		v.AjouterEvenement(i, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));
 	}
 
-	cout << v[1121000].GetSuivant( ) << endl;
-	cout << v[4].GetSuivant( )->GetID() << endl;
+	cout << v[1121000]->GetSuivant( ) << endl;
+	cout << v[4]->GetSuivant( )->GetID() << endl;
 
-	cout << v[4].TempsSegment(5, 5, 6) << endl;
+	cout << v[4]->TempsSegment(5, 5, 6) << endl;
 	v.StatsJour(5);
 
 	v.EmbouteillageJour(5);
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 	s.insererFin(2);
 	s.insererFin(1);
 
-	v.TempsParcours(5, 0, 23, s);
+	v.TempsParcours(5, 0, 23, s);*/
 
 	string lecture;
 	cin >> lecture;
@@ -127,23 +127,35 @@ int main(int argc, char* argv[])
 			v.AjouterEvenement( id, Evenement(trafic, Temps( d7, annee, mois, jour, heure, minute ) ) );
 
 		}
-		else if ( lecture == "NB_STATS_C" )
+		else if ( lecture == "STATS_C" )
 		{
-			// Code cmd2 NB_STATS_C
+			// Code cmd2 STATS_C
 			int idCapteur;
 			cin >> idCapteur;
+			Vecteur<double> stats;
 
-			Vecteur<double> stats = v[idCapteur].StatsPropres();
+			// On vérifie que le captuer d'identifiant idCapteur existe
+			if ( v[idCapteur] )
+			{
+				stats = v[idCapteur]->StatsPropres();	// Si c'est le cas, on calcul ses statistiques
+			}
+			else
+			{
+				for ( int i = 0; i < NB_STATS; i++ )	// Sinon, on considère que nous n'avons pas de données
+				{
+					stats.insererFin( 0 );				// On crée donc des statistiques de 0%
+				}
+			}
 
-			cout << "V " << stats[0] * 100 << "%\r\n";	// TODO: quelle tronche a la fin de ligne ?
+			cout << "V " << stats[0] * 100 << "%\r\n";
 			cout << "J " << stats[1] * 100 << "%\r\n";
 			cout << "R " << stats[2] * 100 << "%\r\n";
 			cout << "N " << stats[3] * 100 << "%\r\n";
 			
 		}
-		else if ( lecture == "NB_STATS_D7" )
+		else if ( lecture == "STATS_D7" )
 		{
-			// Code cmd3 NB_STATS_D7
+			// Code cmd3 STATS_D7
 			int d7;
 			cin >> d7;
 
