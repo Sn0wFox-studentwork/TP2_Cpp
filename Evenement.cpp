@@ -70,7 +70,7 @@ Evenement::Evenement ( const Evenement & unEvenement ) : trafic(unEvenement.traf
 } //----- Fin de Evenement (constructeur de copie)
 
 
-Evenement::Evenement ( ) : temps(), trafic(N)
+Evenement::Evenement ( ) : trafic( N ), temps( )
 // Algorithme :
 //
 {
@@ -80,7 +80,7 @@ Evenement::Evenement ( ) : temps(), trafic(N)
    
 } //----- Fin de Evenement
 
-Evenement::Evenement (Trafic unTrafic, Temps unTemps ) : trafic(unTrafic) , temps(unTemps)
+Evenement::Evenement ( Trafic unTrafic, Temps unTemps ) : trafic( unTrafic ) , temps( unTemps )
 // Algorithme :
 //
 {

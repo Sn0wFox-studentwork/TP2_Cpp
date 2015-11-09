@@ -155,7 +155,6 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 	int meilleurTemps = 0;		// Pour garder en mémoire l'actuel meilleur temps
 	int meilleureMinute = 0;
 	int meilleureHeure = 0;
-	int nombreMinutes = (hFin - hDebut + 1) * 60;
 		// Les trois dernières variables permettent de parcourir correctement la boucle :
 	int heureActuelle = hDebut;
 	int minuteActuelle = 0;
@@ -320,7 +319,7 @@ Capteur*& Ville::operator[] ( int idCapteur ) const
 //-------------------------------------------- Constructeurs - destructeur
 Ville::Ville ( const Ville &uneVille ) :
 	tableDeHachage( uneVille.tableDeHachage ),
-	nombreCapteurs( uneVille.nombreCapteurs ), listeId( uneVille.listeId )
+	listeId( uneVille.listeId ), nombreCapteurs( uneVille.nombreCapteurs )
 // Algorithme :	Initialisation des attributs à partir de ceux de uneVille,
 //				puis recopie des données de semaineResume à partir de celles de uneVille.
 {
@@ -340,7 +339,7 @@ Ville::Ville ( const Ville &uneVille ) :
 
 Ville::Ville ( int nombreSegments, int nombrePremier ) :
 	tableDeHachage( nombreSegments * 5, nombrePremier ),
-	nombreCapteurs( NB_MAX_CAPTEURS ), listeId( )
+	 listeId( ), nombreCapteurs( NB_MAX_CAPTEURS )
 // Algorithme :	Construit une instance de Ville.
 //				Pour le bon fonctionnement de la table de hachage, il faut donner un nombre premier
 //				supérieur à la taille de la table, et une taille de table supérieure au nombre maximum

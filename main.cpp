@@ -23,7 +23,7 @@ using namespace std;
 typedef Vecteur<int> Vint;
 
 
-int main(int argc, char* argv[])
+int main( int argc, char* argv[] )
 // Algorithme :	On lit mot à mot ce qui arrive par l'entrée du programme et on le stocke dans une
 //				variable de type string.
 //				Tant qu'on ne lit pas la commande "EXIT", on lit en boucle jusqu'à tomber sur l'une
@@ -75,6 +75,18 @@ int main(int argc, char* argv[])
 
 	v.TempsParcours(5, 0, 23, s);*/
 
+	Temps t(5, 1586, 5, 2, 6, 8);
+	Evenement e(V, t);
+	clock_t debut = clock();
+	for (int i = 0; i < 20000000; i++)
+	{
+		v.AjouterEvenement(4, e);
+	}
+	double duree = (double)(clock( ) - debut) / CLOCKS_PER_SEC;
+	cout << "Temps d'execution de " << 20000000 << " repetitions : " << duree << " secondes" << endl;
+
+
+
 	string lecture;
 	cin >> lecture;
 
@@ -101,7 +113,7 @@ int main(int argc, char* argv[])
 			cin >> minute;
 			cin >> d7;
 			cin >> traf;
-
+			
 			switch ( traf )
 			{
 			case 'V':
@@ -121,10 +133,10 @@ int main(int argc, char* argv[])
 				break;
 			}
 
-			/*Temps temps(annee, mois, jour, heure, minute, d7);
-			Evenement evenement(temps, trafic);*/
-
-			v.AjouterEvenement( id, Evenement(trafic, Temps( d7, annee, mois, jour, heure, minute ) ) );
+			Temps temps( annee, mois, jour, heure, minute, d7 );
+			Evenement evenement( trafic, temps );
+			
+			v.AjouterEvenement( id, evenement );
 
 		}
 		else if ( lecture == "STATS_C" )
