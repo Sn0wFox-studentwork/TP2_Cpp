@@ -18,7 +18,7 @@ using namespace std;
 #include "Capteur.h"
 
 //------------------------------------------------------------- Constantes
-//#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
+#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
 
 //----------------------------------------------------------------- PUBLIC
 
@@ -105,7 +105,7 @@ Vecteur<double> Capteur::StatsPropres()
 	Vecteur<double> statsRetour;
 	double total =	d1Resume[4] + d2Resume[4] + d3Resume[4] + d4Resume[4] +
 					d5Resume[4] + d6Resume[4] + d7Resume[4];
-	double statTrafic;
+	double statTrafic = 0;
 
 	// Remplissage
 	for ( int i = 0; i < TAILLE_RESUME - 1; i++ )
@@ -167,28 +167,49 @@ int Capteur::TempsSegment ( int d7, int heure, int minute )
 //------------------------------------------------- Surcharge d'opérateurs
 Capteur &Capteur::operator = ( const Capteur &unCapteur )
 // Algorithme :	Si on n'est pas en train de faire unCapteur = unCapteur,
-//				on "copie" tout les champs :
+//				on libère la mémoire des données actuelles,
+//				pui on "copie" tout les champs :
 //				on les modifie pour qu'ils soient comme ceux de unCapteur.
 //				On retourne *this pour la bonne marche de la surcharge d'operateur.
+// A noter :	Pas d'allocation dynamique ici. A priori, nul besoin de dupliquer le(s) capteur(s)
+//				pointé(s) par suivant.
 {
-	identifiant = unCapteur.identifiant;
-
-	for ( int i = 0; i < TAILLE_RESUME; i++ )
+	if ( this != &unCapteur )
 	{
-		d1Resume[i] = unCapteur.d1Resume[i];
-		d2Resume[i] = unCapteur.d2Resume[i];
-		d3Resume[i] = unCapteur.d3Resume[i];
-		d4Resume[i] = unCapteur.d4Resume[i];
-		d5Resume[i] = unCapteur.d5Resume[i];
-		d6Resume[i] = unCapteur.d6Resume[i];
-		d7Resume[i] = unCapteur.d7Resume[i];
-	}
+		cout << "Operator = de <Capteur>" << endl;
+		// Pas d'opération "delete suivant" car a priori suivant n'a pas forcément été alloué dynamiquement.
 
-	for (int m = 0; m < MIN_PAR_SEMAINE; m++)
-	{
-		for (int j = 0; j < NB_STATS; j++)
+		// Réallocation de la chaîne
+		suivant = nullptr;
+		Capteur* cSuiv = unCapteur.GetSuivant( );
+		while ( cSuiv )
 		{
-			semaineResume[m][j] = unCapteur.semaineResume[m][j];
+			cout << "Here !" << endl;
+			suivant = cSuiv;
+			cSuiv = cSuiv->GetSuivant( );
+			suivant = suivant->GetSuivant( );
+			// suivant vaut déjà nullptr ici.
+		}
+
+		identifiant = unCapteur.identifiant;
+
+		for ( int i = 0; i < TAILLE_RESUME; i++ )
+		{
+			d1Resume[i] = unCapteur.d1Resume[i];
+			d2Resume[i] = unCapteur.d2Resume[i];
+			d3Resume[i] = unCapteur.d3Resume[i];
+			d4Resume[i] = unCapteur.d4Resume[i];
+			d5Resume[i] = unCapteur.d5Resume[i];
+			d6Resume[i] = unCapteur.d6Resume[i];
+			d7Resume[i] = unCapteur.d7Resume[i];
+		}
+
+		for ( int m = 0; m < MIN_PAR_SEMAINE; m++ )
+		{
+			for ( int j = 0; j < NB_STATS; j++ )
+			{
+				semaineResume[m][j] = unCapteur.semaineResume[m][j];
+			}
 		}
 	}
 
@@ -230,7 +251,7 @@ Capteur::Capteur ( const Capteur &unCapteur ) : identifiant( unCapteur.identifia
 
 } //----- Fin de Capteur (constructeur de copie)
 
-Capteur::Capteur( int id ) : identifiant( id ), suivant(nullptr)
+Capteur::Capteur( int id ) : identifiant( id ), suivant( nullptr )
 // Algorithme :	Construit une instance de Capteur, d'idendifiant id.
 //				Le pointeur suivant est initialisé comme un nullptr (ne pointe vers rien).
 //				On initialise ensuite toutes les statistiques à 0 pour éviter des comportements indéfinis.
@@ -261,7 +282,7 @@ Capteur::Capteur( int id ) : identifiant( id ), suivant(nullptr)
 } //----- Fin de Capteur
 
 
-Capteur::~Capteur ()
+Capteur::~Capteur ( )
 // Algorithme :	Détruit une instance de Capteur et libère la mémoire occupée par le pointeur suivant
 //				(ne pose pas de problème si le pointeur est null).
 //				TODO: (?) Ceci appel donc le destructeur pour le Capteur pointé par suivant qui fonctionne
@@ -273,6 +294,8 @@ Capteur::~Capteur ()
 	cout << "Appel au destructeur de <Capteur>" << endl;
 #endif
 
-	delete suivant;		// Sinon, personne ne détruit les membres de la liste chaînée de TableHachage
+	// NB:	on ne fait pas d'opération "delete suivant;" car a priori le capteur pointé par suivant n'a
+	//		pas forcément été alloué dynamiquement.
+	//		Il le sera en revanche dans TableHachage : se sera au destructeur de TableHachage de gérer la désallocation.
 
 } //----- Fin de ~Capteur

@@ -40,52 +40,33 @@ int main( int argc, char* argv[] )
 {
 
 	Ville v;
-	
-	/*v.AjouterEvenement(10011, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));	// Collision avec l'ID 4
-	v.AjouterEvenement(2, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));
-	v.AjouterEvenement(2, Evenement(R, Temps(5, 1586, 5, 2, 5, 6)));
-	v.AjouterEvenement(2, Evenement(N, Temps(5, 1586, 5, 2, 5, 7)));
-	v.AjouterEvenement(2, Evenement(V, Temps(5, 1586, 5, 2, 6, 8)));
-	v.AjouterEvenement(1, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));
-	v.AjouterEvenement(1, Evenement(R, Temps(5, 1586, 5, 2, 5, 6)));
-	v.AjouterEvenement(1, Evenement(N, Temps(5, 1586, 5, 2, 5, 7)));
-	v.AjouterEvenement(1, Evenement(V, Temps(5, 1586, 5, 2, 6, 8)));
-	v.AjouterEvenement(4, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));
-	v.AjouterEvenement(4, Evenement(R, Temps(5, 1586, 5, 2, 5, 6)));
-	v.AjouterEvenement(4, Evenement(N, Temps(5, 1586, 5, 2, 5, 7)));
-	v.AjouterEvenement(4, Evenement(V, Temps(5, 1586, 5, 2, 6, 8)));
+	Temps t(7, 2015, 12, 12, 12, 12);
+	Evenement e(N, t);
+	v.AjouterEvenement(1, e);
+	v.AjouterEvenement(10008, e);
 
-	for (int i = 0; i < 1400000; i+=1000)
+	Capteur c(42);
+	Capteur c1(43);
+	Capteur c2(c);
+	Capteur c3 = c2;
+	c3.SetSuivant(&c1);
+	Capteur c4(44);
+	c4 = c3;
+
+	cout << c.GetID() << ends << c1.GetID() << ends << c2.GetID() << ends << c3.GetID() << ends << c4.GetID() << endl;
+	cout << c3.GetSuivant()->GetID() << endl;
+
+	TableHachage th(10, 53);
+	TableHachage th2(15, 79);
+
 	{
-		v.AjouterEvenement(i, Evenement(J, Temps(5, 1586, 5, 2, 5, 5)));
+		Capteur* cth = new Capteur(1);
+		Capteur* c2th = new Capteur(54);
+		th.Inserer(cth);
+		th.Inserer(c2th);
 	}
 
-	cout << v[1121000]->GetSuivant( ) << endl;
-	cout << v[4]->GetSuivant( )->GetID() << endl;
-
-	cout << v[4]->TempsSegment(5, 5, 6) << endl;
-	v.StatsJour(5);
-
-	v.EmbouteillageJour(5);
-	
-	Vint s;
-	s.insererFin(4);
-	s.insererFin(2);
-	s.insererFin(1);
-
-	v.TempsParcours(5, 0, 23, s);*/
-
-	Temps t(5, 1586, 5, 2, 6, 8);
-	Evenement e(V, t);
-	clock_t debut = clock();
-	for (int i = 0; i < 20000000; i++)
-	{
-		v.AjouterEvenement(4, e);
-	}
-	double duree = (double)(clock( ) - debut) / CLOCKS_PER_SEC;
-	cout << "Temps d'execution de " << 20000000 << " repetitions : " << duree << " secondes" << endl;
-
-
+	th2 = th;
 
 	string lecture;
 	cin >> lecture;
@@ -133,7 +114,7 @@ int main( int argc, char* argv[] )
 				break;
 			}
 
-			Temps temps( annee, mois, jour, heure, minute, d7 );
+			Temps temps( d7, annee, mois, jour, heure, minute );
 			Evenement evenement( trafic, temps );
 			
 			v.AjouterEvenement( id, evenement );
@@ -146,7 +127,7 @@ int main( int argc, char* argv[] )
 			cin >> idCapteur;
 			Vecteur<double> stats;
 
-			// On vérifie que le captuer d'identifiant idCapteur existe
+			// On vérifie que le capteur d'identifiant idCapteur existe
 			if ( v[idCapteur] )
 			{
 				stats = v[idCapteur]->StatsPropres();	// Si c'est le cas, on calcul ses statistiques

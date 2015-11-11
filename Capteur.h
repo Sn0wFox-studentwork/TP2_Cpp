@@ -60,7 +60,7 @@ public:
 	// Mode d'emploi :	Retourne la valeur du pointeur suivant (= adresse de la variable pointée).
 
 	void SetSuivant ( Capteur* suiv ) { suivant = suiv; }
-	// Mode d'emploi :	Fait pointer le pointeur suivant vers le capteur pointé par suiv,.
+	// Mode d'emploi :	Fait pointer le pointeur suivant vers le capteur pointé par suiv.
 	//					Suiv peut être un pointeur null (ou un pointeur litéral null nullptr).
 
 
@@ -75,7 +75,7 @@ public:
     //					Les deux capteurs auront alors les même données, mais non partagées (copies).
 
     Capteur ( int id );
-    // Mode d'emploi :	Construit une nouvelle instance de Ville.
+    // Mode d'emploi :	Construit une nouvelle instance de Capteur.
     //					L'identifiant id du Capteur n'a de sens que s'il est unique (ou au moins unique
 	//					pour chaque Ville à laquelle le Capteur appartiendra). Cependant, aucune vérification
 	//					de cette unicité ne sera faîte.
@@ -83,9 +83,9 @@ public:
 	//					que des identifiants id différents pour chaque instance de Capteur.
 
     virtual ~Capteur ( );
-    // Mode d'emploi :	Détruit une instance de Ville et libère la mémoire. Appelé automatiquement.
-    //					On peut noter que détruire un Capteur détruira le Capteur pointé par le pointeur suivant,
-	//					et ainsi de suite (fonctionnement récursif).
+    // Mode d'emploi :	Détruit une instance de Capteur et libère la mémoire. Appelé automatiquement.
+    // Contrat :		Le pointeur suivant n'a a priori pas été alloué dynamiquement. Si tel est tout de même
+	//					le cas, c'est à l'utilisateur de gérer correctement sa désallocation.
 
 //------------------------------------------------------------------ PRIVE
 

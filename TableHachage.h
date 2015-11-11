@@ -18,8 +18,8 @@ const int NB_PREMIER_BASE = 10007;
 //------------------------------------------------------------------------ 
 // Rôle de la classe <TableHachage>
 // La classe TableHachage a été conçue spécialement pour implémenter une hashTable
-// permettant de stocker UNIQUEMENT des pointeurs vers Capteurs. Ce n'est donc
-// pas une classe générique (template).
+// permettant de stocker UNIQUEMENT des pointeurs vers Capteurs alloués DYNAMIQUEMENT.
+// Ce n'est donc pas une classe générique (template).
 // Elle propose deux fonctions de hachage (sous forme de méthodes) qui permettent
 // de générer un clé à partir soit d'un identifiant, soit d'un pointeur vers Capteur
 // (l'une faisant appel à l'autre, toute la cohérence de la table est conservée).
@@ -53,6 +53,12 @@ public:
 	//					si celui-ci est présent dans la table.
 	//					Sinon, retourne un pointeur null.
 	// Contrat :		L'utilisateur s'engage à fournir un idCapteur positif.
+
+	int GetTailleTable ( ) const { return tailleTable; }
+	// Mode d'emploi :	Retourne la valeur de l'attribut tailleTable.
+
+	int GetNombrePremier ( ) const { return nombrePremier; }
+	// Mode d'emploi :	Retourne la valeur de l'attribut nombrePremier.
 
 //------------------------------------------------- Surcharge d'opérateurs
 	TableHachage &operator = ( const TableHachage &uneTableHachage );
@@ -93,6 +99,13 @@ public:
 //------------------------------------------------------------------ PRIVE 
 
 protected:
+//----------------------------------------------------- Méthodes protégées
+	void Liberer ( );
+	// Mode d'emploi :	Libère l'intégralité de la mémoire occupée par la table actuelle
+	//					et par tout les éléments qu'elle contient.
+	// Contrat :		A n'utiliser que lorsqu'on souhaite réattribuer une TableHachage,
+	//					ou un objet ayant pour attribut une TableHachage.
+
 //----------------------------------------------------- Attributs protégés
 	int tailleTable;		// Nombre de cases de table
 	int nombrePremier;		// Nombre premier servant à générer une fonction de hachage

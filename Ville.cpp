@@ -17,7 +17,7 @@ using namespace std;
 #include "Ville.h"
 
 //------------------------------------------------------------- Constantes
-//#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
+#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
 
 //----------------------------------------------------------------- PUBLIC
 
@@ -239,8 +239,10 @@ void Ville::AjouterEvenement( int id, Evenement& evenement )
     }
     else	//si le capteur n'existe pas
     {
-        creerCapteur( id );							//on le crée
-        capteur = tableDeHachage.GetCapteur( id );	//on est donc sur qu'il existe maintenant
+        capteur = new Capteur( id );
+		tableDeHachage.Inserer( capteur );
+		listeId.insererFin( id );							//on le crée
+        capteur = tableDeHachage.GetCapteur( id );			//on est donc sur qu'il existe maintenant
         capteur->Inserer( evenement );
     }
 
@@ -274,19 +276,20 @@ Ville &Ville::operator = ( const Ville &uneVille )
 //					on les modifie pour qu'ils soient comme ceux de uneVille.
 //					On retourne *this pour la bonne marche de la surcharge d'operateur.
 {
-	// Création de nouveaux capteurs à partir de ceux de uneVille
-	nombreCapteurs = uneVille.nombreCapteurs;
-	for (int i = 0; i < nombreCapteurs; i++)
+	if ( this != &uneVille )
 	{
-		tableDeHachage[listeId[i]] = new Capteur(*uneVille.tableDeHachage[listeId[i]]);
-	}
+		// On utilise la surcharge de operator= pour TableHachage et Vecteur
+		tableDeHachage = uneVille.tableDeHachage;
+		listeId = uneVille.listeId;
+		nombreCapteurs = uneVille.nombreCapteurs;
 
-	// Recopie des données de uneVille
-	for (int minute = 0; minute < MIN_PAR_SEMAINE; minute++)
-	{
-		for (int numStat = 0; numStat < NB_STATS; numStat++)
+		// Recopie des autres données de uneVille
+		for ( int minute = 0; minute < MIN_PAR_SEMAINE; minute++ )
 		{
-			semaineResume[minute][numStat] = uneVille.semaineResume[minute][numStat];
+			for ( int numStat = 0; numStat < NB_STATS; numStat++ )
+			{
+				semaineResume[minute][numStat] = uneVille.semaineResume[minute][numStat];
+			}
 		}
 	}
 
@@ -301,7 +304,7 @@ Capteur*& Ville::operator[] ( int idCapteur )
 // Complexité : O(1) Grace à la table de Hachage, s'il n'y a pas de collisions.
 //				O(n) dans le pire des cas, ce qui n'arrivera pas avec notre fonction de hash.
 {
-	return tableDeHachage[tableDeHachage.Hacher( idCapteur)];
+	return tableDeHachage[tableDeHachage.Hacher( idCapteur )];
 
 } //----- Fin de operator []
 
@@ -338,8 +341,8 @@ Ville::Ville ( const Ville &uneVille ) :
 } //----- Fin de Ville (constructeur de copie)
 
 Ville::Ville ( int nombreSegments, int nombrePremier ) :
-	tableDeHachage( nombreSegments * 5, nombrePremier ),
-	 listeId( ), nombreCapteurs( NB_MAX_CAPTEURS )
+	tableDeHachage( nombreSegments * 4, nombrePremier ),
+	listeId( ), nombreCapteurs( NB_MAX_CAPTEURS )
 // Algorithme :	Construit une instance de Ville.
 //				Pour le bon fonctionnement de la table de hachage, il faut donner un nombre premier
 //				supérieur à la taille de la table, et une taille de table supérieure au nombre maximum
@@ -350,9 +353,9 @@ Ville::Ville ( int nombreSegments, int nombrePremier ) :
 #endif
 
 	// Initialisation du résumé hebdomadaire
-	for (int minute = 0; minute < MIN_PAR_SEMAINE; minute++)
+	for ( int minute = 0; minute < MIN_PAR_SEMAINE; minute++ )
 	{
-		for (int numStat = 0; numStat < NB_STATS; numStat++)
+		for ( int numStat = 0; numStat < NB_STATS; numStat++ )
 		{
 			semaineResume[minute][numStat] = 0;
 		}
@@ -361,7 +364,7 @@ Ville::Ville ( int nombreSegments, int nombrePremier ) :
 } //----- Fin de Ville
 
 
-Ville::~Ville ()
+Ville::~Ville ( )
 // Algorithme :	Le destructeur de TableHacahe va être appelé pour tableDeHachage automatiquement.
 //				C'est ce dernier qui va se charger de libérer la mémoire pour tout les capteurs
 //				alloués dynamiquement.
@@ -382,8 +385,5 @@ void Ville::creerCapteur( int id )
 //				Insertion de l'identifiant dans la liste des identifiants.
 // NB:	On suppose que la vérification de l'existence du capteur a été traitée avant l'appel à cette fonction.
 {
-	Capteur* capteur = new Capteur( id );
-	tableDeHachage.Inserer( capteur );
-    listeId.insererFin( id );
 
 } //----- Fin de creerCapteur

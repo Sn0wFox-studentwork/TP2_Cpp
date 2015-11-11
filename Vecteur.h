@@ -12,6 +12,7 @@
 //--------------------------------------------------- Interfaces utilisées
 #include <iostream>
 using namespace std;
+#define MAP
 
 //------------------------------------------------------------- Constantes
 const int TAILLE_MAX_BASE = 5;
@@ -153,11 +154,34 @@ int Vecteur<T>::rechercherPosition(T objet) const
 	return -1;
 } //----- Fin de rechercherPosition
 
+  //------------------------------------------------- Surcharge d'opérateurs
+template <class T>
+Vecteur<T> & Vecteur<T>::operator = ( const Vecteur<T> & unVecteur )
+// Algorithme :		Si on n'est pas en train de faire unVecteur = unVecteur,
+//					on "copie" tout les champs :
+//					on les modifie pour qu'ils soient comme ceux de unVecteur.
+//					On retourne *this pour la bonne marche de la surcharge d'operateur.
+{
+	if ( this != &unVecteur )
+	{
+		tailleActuelle = unVecteur.tailleActuelle;
+		tailleMax = unVecteur.tailleMax;
+		delete[] elements;
+		elements = new T[tailleMax];
+		for (int i = 0; i<tailleMax; i++)
+		{
+			elements[i] = unVecteur[i];
+		}
+	}
+	return *this;
+
+} //----- Fin de operator =
+
 template<class T>
-T& Vecteur<T>::operator[] (int index)
+T& Vecteur<T>::operator[] ( int index )
 // Algorithme : Retour par reference
 {
-	if (index >= 0 || index < tailleActuelle)
+	if ( index >= 0 || index < tailleActuelle )
 	{
 		return elements[index];
 	}
@@ -182,30 +206,7 @@ T Vecteur<T>::operator[] ( int index ) const
 } //----- Fin de operator[]
 
 
-  //------------------------------------------------- Surcharge d'opérateurs
-template <class T>
-Vecteur<T> & Vecteur<T>::operator = ( const Vecteur<T> & unVecteur )
-// Algorithme :		Si on n'est pas en train de faire unVecteur = unVecteur,
-//					on "copie" tout les champs :
-//					on les modifie pour qu'ils soient comme ceux de unVecteur.
-//					On retourne *this pour la bonne marche de la surcharge d'operateur.
-{
-	if (this != &unVecteur)
-	{
-		tailleActuelle = unVecteur.tailleActuelle;
-		tailleMax = unVecteur.tailleMax;
-		elements = new T[tailleMax];
-		for (int i = 0; i<unVecteur.tailleActuelle; i++)
-		{
-			elements[i] = unVecteur[i];
-		}
-	}
-	return *this;
-
-} //----- Fin de operator =
-
-
-  //-------------------------------------------- Constructeurs - destructeur
+//-------------------------------------------- Constructeurs - destructeur
 template <class T>
 Vecteur<T>::Vecteur( const Vecteur<T> & unVecteur ) :	tailleActuelle(unVecteur.tailleActuelle),
 														tailleMax(unVecteur.tailleMax)
@@ -216,7 +217,7 @@ Vecteur<T>::Vecteur( const Vecteur<T> & unVecteur ) :	tailleActuelle(unVecteur.t
 #endif
 
 	elements = new T[tailleMax];
-	for (int i = 0; i<unVecteur.tailleActuelle; i++)
+	for (int i = 0; i<tailleMax; i++)
 	{
 		elements[i] = unVecteur[i];
 	}
@@ -232,6 +233,10 @@ Vecteur<T>::Vecteur( int tMax ) : tailleActuelle(0), tailleMax(tMax)
 #endif
 
 	elements = new T[tailleMax];
+	for (int i = 0; i<tailleMax; i++)
+	{
+		elements[i] = 0;
+	}
 
 } //----- Fin de Vecteur
 

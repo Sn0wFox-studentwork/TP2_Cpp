@@ -18,7 +18,7 @@ using namespace std;
 #include "TableHachage.h"
 
 //------------------------------------------------------------- Constantes
-//#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
+#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
 
 //----------------------------------------------------------------- PUBLIC
 
@@ -99,7 +99,7 @@ Capteur * TableHachage::GetCapteur ( int idCapteur ) const
 	{
 		if ( capteur->GetID( ) == idCapteur )
 		{
-			return capteur;		// Retour du premier capteur donc l'identifiant correspond
+			return capteur;		// Retour du premier capteur dont l'identifiant correspond
 		}
 		else
 		{
@@ -112,7 +112,6 @@ Capteur * TableHachage::GetCapteur ( int idCapteur ) const
 
 } //----- Fin de GetCapteur
 
-
 //------------------------------------------------- Surcharge d'opérateurs
 TableHachage & TableHachage::operator= ( const TableHachage & uneTableHachage )
 // Algorithme :	Si on n'est pas en train de faire uneTableHachage = uneTableHachage,
@@ -122,15 +121,47 @@ TableHachage & TableHachage::operator= ( const TableHachage & uneTableHachage )
 {
 	if ( this != &uneTableHachage )
 	{
+		// Désallocation
+		Liberer( );
+
+		// Réallocation
 		tailleTable = uneTableHachage.tailleTable;
 		nombrePremier = uneTableHachage.nombrePremier;
-
 		table = new Capteur*[tailleTable];
+
 		for ( int i = 0; i < tailleTable; i++ )
 		{
-			table[i] = uneTableHachage.table[i];
-		}
-	}
+			// Création variables de recopie des collisions (réinitialisation à chaque boucle)
+			Capteur* c = nullptr;
+			Capteur* cSuivUneTableDeHachage = nullptr;
+
+			// Si il y a un capteur à l'indice i
+			if ( uneTableHachage.table[i] )
+			{
+				table[i] = new Capteur( *uneTableHachage.table[i] );	// On le recopie (et notre table ne gère que des allocations dynamiques)
+			}
+			// Sinon on initialise à nullptr;
+			else
+			{
+				table[i] = nullptr;
+			}
+
+			// Recopie des collisions
+			c = table[i];
+			if ( uneTableHachage.table[i] )
+			{
+				cSuivUneTableDeHachage = uneTableHachage.table[i]->GetSuivant();
+			}
+
+			while ( cSuivUneTableDeHachage )
+			{
+				Capteur* nouveauSuivant = new Capteur( *cSuivUneTableDeHachage );	// Notre table ne gère que des allocation dynamiques
+				c->SetSuivant( nouveauSuivant );
+				c = c->GetSuivant( );
+				cSuivUneTableDeHachage = cSuivUneTableDeHachage->GetSuivant( );
+			}
+		}		
+	} //----- Fin de for ( i<tailleTable ) 
 
 	return *this;
 
@@ -156,33 +187,41 @@ Capteur *& TableHachage::operator[] ( int index ) const
 
 //-------------------------------------------- Constructeurs - destructeur
 TableHachage::TableHachage( const TableHachage & uneTableHachage ) :
-	tailleTable(uneTableHachage.tailleTable),
-	nombrePremier(uneTableHachage.nombrePremier)
+	tailleTable( uneTableHachage.tailleTable ),
+	nombrePremier( uneTableHachage.nombrePremier )
 // Algorithme :	Initialisation des attributs à partir de ceux de uneTableHachage,
 //				puis recopie des données de table à partir de celles de uneTableHachage.
 //				Allocation dynamique pour la nouvelle table. Tant qu'il y a collision dans
 //				uneTableDeHachage, on continue à générer dynamiquement de nouveaux capteurs
-//				à partir de ce de uneTableDeHachage à à les insérer dans la nouvelle liste chaînée.
+//				à partir de ceux de uneTableDeHachage et à les insérer dans la nouvelle liste chaînée (si nécesssaire).
 {
 #ifdef MAP
 	cout << "Appel au constructeur de copie de <TableHachage>" << endl;
 #endif
 
 	table = new Capteur*[tailleTable];
-	Capteur* c = nullptr;
-	Capteur* cUneTableDeHachage = nullptr;
+	
 	for ( int i = 0; i < tailleTable; i++ )
 	{
+		// Création variables de recopie des collisions (réinitialisation à chaque boucle)
+		Capteur* c = nullptr;
+		Capteur* cSuivUneTableDeHachage = nullptr;
+
+		// Allocation
 		table[i] = new Capteur( *uneTableHachage.table[i] );
 
 		// Recopie des collisions
 		c = table[i];
-		cUneTableDeHachage = uneTableHachage.table[i]->GetSuivant( );
-		while ( cUneTableDeHachage != nullptr )
+		if ( uneTableHachage.table[i] )
 		{
-			c->SetSuivant( cUneTableDeHachage );
+			cSuivUneTableDeHachage = uneTableHachage.table[i]->GetSuivant();
+		}
+		while ( cSuivUneTableDeHachage != nullptr )
+		{
+			Capteur* nouveauSuivant = new Capteur( *cSuivUneTableDeHachage );	// Notre table ne gère que des allocation dynamiques
+			c->SetSuivant( nouveauSuivant );
 			c = c->GetSuivant( );
-			cUneTableDeHachage = cUneTableDeHachage->GetSuivant( );
+			cSuivUneTableDeHachage = cSuivUneTableDeHachage->GetSuivant( );
 		}
 	}
 } //----- Fin de TableHachage (constructeur de copie)
@@ -205,7 +244,7 @@ TableHachage::TableHachage ( int taille, int nbPremier ):
 } //----- Fin de TableHachage
 
 
-TableHachage::~TableHachage()
+TableHachage::~TableHachage ( )
 // Algorithme :	Nous sommes en présence d'un tabeau alloué dynamiquement de pointeurs
 //				alloués dynamiquement.
 //				On détruit donc chaque élément du tableau table (qui grâce à l'appel du destructeur
@@ -217,11 +256,38 @@ TableHachage::~TableHachage()
 	cout << "Appel au destructeur de <TableHachage>" << endl;
 #endif
 
+	Liberer( );
+
+} //----- Fin de ~TableHachage
+
+//------------------------------------------------------------------ PRIVE
+
+//----------------------------------------------------- Méthodes protégées
+void TableHachage::Liberer ( )
+// Algorithme :	Nous sommes en présence d'un tabeau alloué dynamiquement de pointeurs
+//				alloués dynamiquement.
+//				On détruit donc chaque élément du tableau table (qui grâce à l'appel du destructeur
+//				de Capteur va détruire la liste châinée),
+//				puis on détruit le tableau lui-même.
+//				Un simple delete[] table n'aurait pas libéré toute la mémoire.
+{
 	for ( int i = 0; i < tailleTable; i++ )
 	{
-		delete table[i];
+		Capteur* c = table[i];
+		Capteur* cTampon = nullptr;
+		if ( c )
+		{
+			c = table[i]->GetSuivant();		// On conserve un pointeur vers l'élément suivant avant la désallocation
+			delete table[i];				// Désallocation du premier élément
+			while ( c )
+			{
+				cTampon = c->GetSuivant();	// On conserve un pointeur vers l'élément suivant avant la désallocation
+				delete c;					// Désallocation de l'élément suivant dans la liste chaînée
+				c = cTampon;				// On reprend la valeur tamponnée deux lignes plus haut
+			}
+		}
 	}
 
 	delete[] table;
-
-} //----- Fin de ~TableHachage
+	tailleTable = 0;
+}

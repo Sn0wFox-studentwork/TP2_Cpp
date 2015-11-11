@@ -5,7 +5,7 @@
     copyright            : (C) 2015 par Pericas-Belletier
 *************************************************************************/
 
-//---------- Réalisation de la classe <Temps> (fichier ${file_name}) --
+//---------- Réalisation de la classe <Temps> (fichier Temps.cpp) --
 
 //---------------------------------------------------------------- INCLUDE
 
@@ -15,13 +15,6 @@ using namespace std;
 
 //------------------------------------------------------ Include personnel
 #include "Temps.h"
-
-//------------------------------------------------------------- Constantes
-
-//---------------------------------------------------- Variables de classe
-
-//----------------------------------------------------------- Types privés
-
 
 //----------------------------------------------------------------- PUBLIC
 //-------------------------------------------------------- Fonctions amies
@@ -36,18 +29,23 @@ using namespace std;
 
 //------------------------------------------------- Surcharge d'opérateurs
 Temps & Temps::operator = ( const Temps & unTemps )
-// Algorithme :
-//
+// Algorithme :	Si on n'est pas en train de faire unTemps = unTemps,
+//				on "copie" tout les champs :
+//				on les modifie pour qu'ils soient comme ceux de unTemps.
+//				On retourne *this pour la bonne marche de la surcharge d'operateur.
 {
-
-    d7 = unTemps.d7;
-    annee = unTemps.annee;
-    mois = unTemps.mois;
-    jour = unTemps.jour;
-    heure = unTemps.heure;
-    minute = unTemps.minute;
+	if ( this != &unTemps )
+	{
+		d7 = unTemps.d7;
+		annee = unTemps.annee;
+		mois = unTemps.mois;
+		jour = unTemps.jour;
+		heure = unTemps.heure;
+		minute = unTemps.minute;
+	}
 
     return *this;
+
 } //----- Fin de operator =
 
 bool Temps::operator== (const Temps & unTemps) const
