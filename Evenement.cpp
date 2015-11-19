@@ -1,11 +1,11 @@
 /*************************************************************************
                            Evenement  -  description
                              -------------------
-    début                : ${date}
-    copyright            : (C) ${year} par ${user}
+    début                : 19/10/2015
+    copyright            : (C) 2015 par Pericas-Belletier
 *************************************************************************/
 
-//---------- Réalisation de la classe <Evenement> (fichier ${file_name}) --
+//---------- Réalisation de la classe <Evenement> (fichier Evenement.cpp) --
 
 //---------------------------------------------------------------- INCLUDE
 
@@ -16,52 +16,42 @@ using namespace std;
 //------------------------------------------------------ Include personnel
 #include "Evenement.h"
 
-//------------------------------------------------------------- Constantes
-
-//---------------------------------------------------- Variables de classe
-
-//----------------------------------------------------------- Types privés
-
-
 //----------------------------------------------------------------- PUBLIC
-//-------------------------------------------------------- Fonctions amies
 
 //----------------------------------------------------- Méthodes publiques
-// type Evenement::Méthode ( liste de paramètres )
-// Algorithme :
-//
-//{
-//} //----- Fin de Méthode
-
 
 //------------------------------------------------- Surcharge d'opérateurs
-Evenement & Evenement::operator = ( const Evenement & unEvenement )
-// Algorithme :
-//
+Evenement & Evenement::operator = (const Evenement & unEvenement)
+// Algorithme :	Si on n'est pas en train de faire unEvenement = unEvenement,
+//				on "copie" tout les champs :
+//				on les modifie pour qu'ils soient comme ceux de unEvenement.
+//				On retourne *this pour la bonne marche de la surcharge d'operateur.
 {
-    temps = unEvenement.temps;		// appel à la surcharge de = de Temps
-    trafic = unEvenement.trafic;
+	if ( this != &unEvenement )
+	{
+		temps = unEvenement.temps;		// appel à la surcharge de = de Temps
+		trafic = unEvenement.trafic;
+	}
+
     return *this;
+
 } //----- Fin de operator =
 
 bool Evenement::operator== ( const Evenement & unEvenement ) const
-// Algorithme : comparaison des temps
-//
+// Algorithme :	comparaison sur l'attribut temps
 {
     return temps == unEvenement.temps;
 } //----- Fin de operator ==
 
 bool Evenement::operator< ( const Evenement & unEvenement ) const
-// Algorithme : comparaison des temps
-//
+// Algorithme : comparaison sur l'attribut temps
 {
     return temps < unEvenement.temps;
 } //----- Fin de operator <
 
 //-------------------------------------------- Constructeurs - destructeur
 Evenement::Evenement ( const Evenement & unEvenement ) : trafic(unEvenement.trafic), temps(unEvenement.temps)
-// Algorithme :
-//
+// Algorithme :	les constructeurs de copies des membres sont déjà définis
 {
 #ifdef MAP
     cout << "Appel au constructeur de copie de <Evenement>" << endl;
@@ -71,8 +61,7 @@ Evenement::Evenement ( const Evenement & unEvenement ) : trafic(unEvenement.traf
 
 
 Evenement::Evenement ( ) : trafic( N ), temps( )
-// Algorithme :
-//
+// Algorithme : On donne à l'Evenement le temps par défaut et le trafic maximum
 {
 #ifdef MAP
     cout << "Appel au constructeur de <Evenement>" << endl;
@@ -81,8 +70,7 @@ Evenement::Evenement ( ) : trafic( N ), temps( )
 } //----- Fin de Evenement
 
 Evenement::Evenement ( Trafic unTrafic, Temps unTemps ) : trafic( unTrafic ) , temps( unTemps )
-// Algorithme :
-//
+// Algorithme : Affectation en utilisant les constructeurs déjà définis
 {
 #ifdef MAP
     cout << "Appel au constructeur par paramètres de <Evenement>" << endl;
@@ -91,8 +79,7 @@ Evenement::Evenement ( Trafic unTrafic, Temps unTemps ) : trafic( unTrafic ) , t
 } //----- Fin de Evenement
 
 Evenement::~Evenement ( )
-// Algorithme :
-//
+// Algorithme : Les membres ont déjà un destructeur bien défini. Rien de particulier à gérer.
 {
 #ifdef MAP
     cout << "Appel au destructeur de <Evenement>" << endl;
@@ -100,9 +87,3 @@ Evenement::~Evenement ( )
 
 } //----- Fin de ~Evenement
 
-
-//------------------------------------------------------------------ PRIVE
-
-//----------------------------------------------------- Méthodes protégées
-
-//------------------------------------------------------- Méthodes privées

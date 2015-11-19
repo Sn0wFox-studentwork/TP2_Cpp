@@ -40,33 +40,6 @@ int main( int argc, char* argv[] )
 {
 
 	Ville v;
-	Temps t(7, 2015, 12, 12, 12, 12);
-	Evenement e(N, t);
-	v.AjouterEvenement(1, e);
-	v.AjouterEvenement(10008, e);
-
-	Capteur c(42);
-	Capteur c1(43);
-	Capteur c2(c);
-	Capteur c3 = c2;
-	c3.SetSuivant(&c1);
-	Capteur c4(44);
-	c4 = c3;
-
-	cout << c.GetID() << ends << c1.GetID() << ends << c2.GetID() << ends << c3.GetID() << ends << c4.GetID() << endl;
-	cout << c3.GetSuivant()->GetID() << endl;
-
-	TableHachage th(10, 53);
-	TableHachage th2(15, 79);
-
-	{
-		Capteur* cth = new Capteur(1);
-		Capteur* c2th = new Capteur(54);
-		th.Inserer(cth);
-		th.Inserer(c2th);
-	}
-
-	th2 = th;
 
 	string lecture;
 	cin >> lecture;
@@ -136,7 +109,7 @@ int main( int argc, char* argv[] )
 			{
 				for ( int i = 0; i < NB_STATS; i++ )	// Sinon, on considère que nous n'avons pas de données
 				{
-					stats.insererFin( 0 );				// On crée donc des statistiques de 0%
+					stats.InsererFin( 0 );				// On crée donc des statistiques de 0%
 				}
 			}
 
@@ -181,7 +154,7 @@ int main( int argc, char* argv[] )
 			for ( int i = 0; i < nombreSegments; i++ )
 			{
 				cin >> idSegment;
-				segments.insererFin( idSegment );
+				segments.InsererFin( idSegment );
 			}
 
 			v.TempsParcours( d7, hDebut, hFin, segments );

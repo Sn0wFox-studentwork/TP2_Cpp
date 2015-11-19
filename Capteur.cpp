@@ -18,7 +18,7 @@ using namespace std;
 #include "Capteur.h"
 
 //------------------------------------------------------------- Constantes
-#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
+//#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
 
 //----------------------------------------------------------------- PUBLIC
 
@@ -119,7 +119,7 @@ Vecteur<double> Capteur::StatsPropres()
 		{
 			statTrafic = 0;
 		}
-		statsRetour.insererFin(statTrafic);
+		statsRetour.InsererFin(statTrafic);
 	}
 	
 	return statsRetour;
@@ -168,15 +168,17 @@ int Capteur::TempsSegment ( int d7, int heure, int minute )
 Capteur &Capteur::operator = ( const Capteur &unCapteur )
 // Algorithme :	Si on n'est pas en train de faire unCapteur = unCapteur,
 //				on libère la mémoire des données actuelles,
-//				pui on "copie" tout les champs :
+//				puis on "copie" tout les champs :
 //				on les modifie pour qu'ils soient comme ceux de unCapteur.
 //				On retourne *this pour la bonne marche de la surcharge d'operateur.
 // A noter :	Pas d'allocation dynamique ici. A priori, nul besoin de dupliquer le(s) capteur(s)
 //				pointé(s) par suivant.
 {
+#ifdef MAP
+	cout << "Operator = de <Capteur>" << endl;
+#endif
 	if ( this != &unCapteur )
 	{
-		cout << "Operator = de <Capteur>" << endl;
 		// Pas d'opération "delete suivant" car a priori suivant n'a pas forcément été alloué dynamiquement.
 
 		// Réallocation de la chaîne

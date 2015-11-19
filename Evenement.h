@@ -26,8 +26,9 @@ enum Trafic{
 
 //------------------------------------------------------------------------
 // Rôle de la classe <Evenement>
-//
-//
+// La classe Événement représente le trafic perçu par un Capteur à un temps donné.
+// Elle est composée d'un temps et d'un trafic, ce dernier étant traduit par une énumération basique (V, J, R ou N).
+// Elle permet un accès plus direct à chacune de ces composantes.
 //------------------------------------------------------------------------
 
 class Evenement
@@ -36,83 +37,49 @@ class Evenement
 
 public:
 //----------------------------------------------------- Méthodes publiques
-    // type Méthode ( liste de paramètres );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+
 	Trafic GetTrafic() const { return trafic; }
-    // Donne le trafic
+    // Mode d'emplois :	Donne le trafic
 
 	int GetD7() const { return temps.GetD7(); }
-	// Donne le jour de la semaine
+	// Mode d'emplois :	Donne le jour de la semaine
 
 	int GetHeure() const {  return temps.GetHeure(); }
-	// Donne l'heure
+	// Mode d'emplois :	Donne l'heure
 
 	int GetMinute() const { return temps.GetMinute(); }
-	// Donne la minute
+	// Mode d'emplois :	Donne la minute
 
 //------------------------------------------------- Surcharge d'opérateurs
     Evenement & operator = ( const Evenement & unEvenement );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi : Réaffecte l'instance courante pour la rendre en tout point similaire à unEvenement.
 
     bool operator== ( const Evenement & unEvenement ) const;
-    //surcharge de comparaison
+	// Mode d'emploi : Retourne true si les deux Evenements sont égaux (en termes de temps), false sinon.
 
     bool operator< ( const Evenement & unEvenement ) const;
-    //surcharge de comparaison
+	// Mode d'emploi : Retourne true si l'Evenement courant est antérieur à unEvenement, false sinon.
 
 
 //-------------------------------------------- Constructeurs - destructeur
     Evenement ( const Evenement & unEvenement );
-    // Mode d'emploi (constructeur de copie) :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi (constructeur de copie) : Construit une nouvelle instance de Evenement à partir d'un Evenement existant unEvenement.
 
     Evenement ( );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi : Construit par défaut un Evenement se produisant à un Temps nul et de trafic maximum.
 
-    Evenement (Trafic unTrafic, Temps unTemps );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+    Evenement ( Trafic unTrafic, Temps unTemps );
+	// Mode d'emploi : Construit un Evenement dont les attributs sont donnés par l'utilisateur.
 
     virtual ~Evenement ( );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi : Detruit une instance d'Evenement
 
 //------------------------------------------------------------------ PRIVE
-
-protected:
-//----------------------------------------------------- Méthodes protégées
-
-private:
-//------------------------------------------------------- Méthodes privées
 
 protected:
 //----------------------------------------------------- Attributs protégés
 Trafic trafic;
 Temps temps;
-
-private:
-//------------------------------------------------------- Attributs privés
-
-//---------------------------------------------------------- Classes amies
-
-//-------------------------------------------------------- Classes privées
-
-//----------------------------------------------------------- Types privés
 
 };
 

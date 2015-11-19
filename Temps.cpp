@@ -17,15 +17,6 @@ using namespace std;
 #include "Temps.h"
 
 //----------------------------------------------------------------- PUBLIC
-//-------------------------------------------------------- Fonctions amies
-
-//----------------------------------------------------- Méthodes publiques
-// type Temps::Méthode ( liste de paramètres )
-// Algorithme :
-//
-//{
-//} //----- Fin de Méthode
-
 
 //------------------------------------------------- Surcharge d'opérateurs
 Temps & Temps::operator = ( const Temps & unTemps )
@@ -49,7 +40,7 @@ Temps & Temps::operator = ( const Temps & unTemps )
 } //----- Fin de operator =
 
 bool Temps::operator== (const Temps & unTemps) const
-//Algorithme :
+// Algorithme :	Comparaison attribut à attribut par importance décroissante
 {
     if ( d7 != unTemps.d7 )
     {
@@ -82,7 +73,8 @@ bool Temps::operator== (const Temps & unTemps) const
 } //----- Fin de operator==
 
 bool Temps::operator< ( const Temps & unTemps ) const
-//Algorithme :
+// Algorithme :	Comparaison attribut à attribut par importance décroissante. d7 n'intervient pas.
+//				On considère l'ordre chronologique.
 {
     if ( annee < unTemps.annee )
     {
@@ -118,63 +110,45 @@ bool Temps::operator< ( const Temps & unTemps ) const
 
 
 //-------------------------------------------- Constructeurs - destructeur
-Temps::Temps ( const Temps & unTemps )
-// Algorithme :
-//
+Temps::Temps ( const Temps & unTemps ) :	d7( unTemps.d7 ), annee( unTemps.annee ), mois( unTemps.mois ),
+											jour( unTemps.jour ), heure( unTemps.heure ), minute( unTemps.minute )
+// Algorithme :	Affectation basique.
 {
 #ifdef MAP
     cout << "Appel au constructeur de copie de <Temps>" << endl;
 #endif
-    d7 = unTemps.d7;
-    annee = unTemps.annee;
-    mois = unTemps.mois;
-    jour = unTemps.jour;
-    heure = unTemps.heure;
-    minute = unTemps.minute;
+   
 } //----- Fin de Temps (constructeur de copie)
 
 
-Temps::Temps ( )
-// Algorithme :
+Temps::Temps ( ) :	d7( 1 ), annee( 0 ), mois( 0 ),
+					jour( 0 ), heure( 0 ), minute( 0 )
+// Algorithme :	Initialisation de tous les termes à 0 (sauf d7 à 1)
 //
 {
 #ifdef MAP
     cout << "Appel au constructeur de <Temps>" << endl;
 #endif
-    d7 = 0;
-    annee = 0;
-    mois = 0;
-    jour = 0;
-    heure = 0;
-    minute = 0;
+
 } //----- Fin de Temps
 
-Temps::Temps ( int und7, int uneAnnee, int unMois, int unJour, int uneHeure, int uneMinute )
-//Algorithme :
+Temps::Temps ( int und7, int uneAnnee, int unMois, int unJour, int uneHeure, int uneMinute ) :
+	d7( und7 ), annee( uneAnnee ), mois( unMois ),
+	jour( unJour ), heure( uneHeure ), minute( uneMinute )
+// Algorithme :	Affectation basique.
 {
 #ifdef MAP
     cout << "Appel au constructeur de <Temps> par paramètres" << endl;
 #endif
-    d7 = und7;
-    annee = uneAnnee;
-    mois = unMois;
-    jour = unJour;
-    heure = uneHeure;
-    minute = uneMinute;
+
 }
 
 Temps::~Temps ( )
 // Algorithme : Rien de particulier à detruire
-//
+
 {
 #ifdef MAP
     cout << "Appel au destructeur de <Temps>" << endl;
 #endif
+
 } //----- Fin de ~Temps
-
-
-//------------------------------------------------------------------ PRIVE
-
-//----------------------------------------------------- Méthodes protégées
-
-//------------------------------------------------------- Méthodes privées

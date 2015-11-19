@@ -18,7 +18,7 @@ using namespace std;
 #include "TableHachage.h"
 
 //------------------------------------------------------------- Constantes
-#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
+//#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
 
 //----------------------------------------------------------------- PUBLIC
 

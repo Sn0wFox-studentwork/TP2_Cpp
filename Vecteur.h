@@ -12,17 +12,18 @@
 //--------------------------------------------------- Interfaces utilisées
 #include <iostream>
 using namespace std;
-#define MAP
+//#define MAP
 
 //------------------------------------------------------------- Constantes
 const int TAILLE_MAX_BASE = 5;
 
-//------------------------------------------------------------------ Types
-
 //------------------------------------------------------------------------
 // Rôle de la classe <Vecteur>
-//
-//
+// Vecteur est un tableau dynamique. Sa taille s'adapte automatiquement à ce
+// qu'on tente de lui ajouter. La surcharge de [i] permet d'accéder au ième
+// élément ajouté.
+// Elle permet de manipuler plus facilement des ensembles de données,
+// et nottement de faire un retour simple de plusieurs valeurs.
 //------------------------------------------------------------------------
 
 template <typename T>
@@ -32,61 +33,45 @@ class Vecteur
 
 public:
 //----------------------------------------------------- Méthodes publiques
-    // type Méthode ( liste de paramètres );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
 
-    void insererFin( T objet );
-    //Insere à la fin
+    void InsererFin( T objet );
+	// Mode d'emploi :	Insere un élément à la fin
 
-    int rechercherPosition( T objet ) const;
-	// Rechercher l'indice d'un objet
-	// Necessite le surcharge de > sur le type T
-	// Renvoie -1 si non trouvé
+    int RechercherPosition( T objet ) const;
+	// Mode d'emploi :	Rechercher l'indice d'un objet.
+	//					Necessite le surcharge de > sur le type T.
+	//					Renvoie -1 si non trouvé.
 
 	int GetTaille() const { return tailleActuelle;  }
+	// Mode d'emploi :	Retourne la valeur de l'attribut tailleActuelle = nombre d'éléments présent dans le Vecteur
 
 //------------------------------------------------- Surcharge d'opérateurs
     Vecteur & operator = ( const Vecteur & unVecteur );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi :	Réaffecte l'instance courante pour la rendre en tout point similaire à unVecteur.
+	//					Les deux Vecteurs auront alors les même données, mais non partagées (copies).
 
 	T& operator[] ( int index );		// ATTENTION : retour de ref, sinon tout plante
-    // Acces à l'element contenu à l'index index
+	// Mode d'emploi :	Acces à l'element contenu à l'index index
+	//					l'index doit être existant, c'est a dire positif et inferieur à tailleActuelle
 
 	T operator[] ( int index ) const;
-	// Acces à l'element contenu à l'index index
+	// Mode d'emploi :	Acces à l'element contenu à l'index index
+	//					l'index doit être existant, c'est a dire positif et inferieur à tailleActuelle
 
 //-------------------------------------------- Constructeurs - destructeur
     Vecteur ( const Vecteur & unVecteur );
-    // Mode d'emploi (constructeur de copie) :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi :	Consruit une nouvelle instance de Vecteur à partir d'un Vecteur existant unVecteur.
+	//					Les deux Vecteurs auront alors les même données, mais non partagées (copies).
 
     Vecteur ( int tailleMax = TAILLE_MAX_BASE );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi :  Construit une nouvelle instance de vecteur vide, avec une taille mémoire préallouée pour tailleMax
+	//                  éléments.
+	// Contrat :		Envoyer une taille réaliste (positive)
 
     virtual ~Vecteur ( );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi :  Detruit l'instance de Vecteur pour laquelle la méthode est appelée.
 
 //------------------------------------------------------------------ PRIVE
-
-protected:
-//----------------------------------------------------- Méthodes protégées
-
-private:
-//------------------------------------------------------- Méthodes privées
 
 protected:
 //----------------------------------------------------- Attributs protégés
@@ -94,20 +79,11 @@ int tailleActuelle;
 int tailleMax;
 T* elements;
 
-private:
-//------------------------------------------------------- Attributs privés
-
-//---------------------------------------------------------- Classes amies
-
-//-------------------------------------------------------- Classes privées
-
-//----------------------------------------------------------- Types privés
-
 };
 
-//----------------------------------------- Types dépendants de <Vecteur>
+//----------------------------------------- Réalisation Template de <Vecteur>
 template <class T>
-void Vecteur<T>::insererFin(T objet)
+void Vecteur<T>::InsererFin(T objet)
 //Algorithme :  regarde si il reste de la place prête.
 //              Si ce n'est pas le cas, réalloue la mémoire de sorte à recreer de la place pour des insertions.
 //              Ensuite, insere l'objet à la fin de la liste.
@@ -125,10 +101,10 @@ void Vecteur<T>::insererFin(T objet)
 	}
 	elements[tailleActuelle++] = objet;
 
-}//------Fin de insererFin
+}//------Fin de InsererFin
 
 template<class T>
-int Vecteur<T>::rechercherPosition(T objet) const
+int Vecteur<T>::RechercherPosition(T objet) const
 //Algorithme :  On suppose que les objets sont ajoutés de manière ordonnées
 //              on va donc faire une recherche dichotomique sur l'intervalle [indexMin, indexMax]
 {
@@ -152,7 +128,7 @@ int Vecteur<T>::rechercherPosition(T objet) const
 		return i;
 	}
 	return -1;
-} //----- Fin de rechercherPosition
+} //----- Fin de RechercherPosition
 
   //------------------------------------------------- Surcharge d'opérateurs
 template <class T>
@@ -208,8 +184,8 @@ T Vecteur<T>::operator[] ( int index ) const
 
 //-------------------------------------------- Constructeurs - destructeur
 template <class T>
-Vecteur<T>::Vecteur( const Vecteur<T> & unVecteur ) :	tailleActuelle(unVecteur.tailleActuelle),
-														tailleMax(unVecteur.tailleMax)
+Vecteur<T>::Vecteur( const Vecteur<T> & unVecteur ) :	tailleActuelle( unVecteur.tailleActuelle ),
+														tailleMax( unVecteur.tailleMax )
 // Algorithme : copie sequentielle d'éléments
 {
 #ifdef MAP
@@ -225,7 +201,7 @@ Vecteur<T>::Vecteur( const Vecteur<T> & unVecteur ) :	tailleActuelle(unVecteur.t
 } //----- Fin de Vecteur (constructeur de copie)
 
 template<class T>
-Vecteur<T>::Vecteur( int tMax ) : tailleActuelle(0), tailleMax(tMax)
+Vecteur<T>::Vecteur( int tMax ) : tailleActuelle(0), tailleMax( tMax )
 // Algorithme : Cree un vecteur avec de la place prête pour tMax insertions
 {
 #ifdef MAP

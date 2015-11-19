@@ -54,12 +54,6 @@ public:
 	//					Sinon, retourne un pointeur null.
 	// Contrat :		L'utilisateur s'engage à fournir un idCapteur positif.
 
-	int GetTailleTable ( ) const { return tailleTable; }
-	// Mode d'emploi :	Retourne la valeur de l'attribut tailleTable.
-
-	int GetNombrePremier ( ) const { return nombrePremier; }
-	// Mode d'emploi :	Retourne la valeur de l'attribut nombrePremier.
-
 //------------------------------------------------- Surcharge d'opérateurs
 	TableHachage &operator = ( const TableHachage &uneTableHachage );
 	// Mode d'emploi :	Réaffecte l'instance courante pour la rendre en tout point similaire à uneTableHachage.

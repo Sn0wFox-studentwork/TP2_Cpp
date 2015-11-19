@@ -17,7 +17,7 @@ using namespace std;
 #include "Ville.h"
 
 //------------------------------------------------------------- Constantes
-#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
+//#define MAP	// Permet de visualiser les appels aux constructeurs/destructeurs et certains éléments de debugging
 
 //----------------------------------------------------------------- PUBLIC
 
@@ -169,6 +169,7 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 			temps = 0;	// Remise à jour pour calcul du temps lors du départ à heureActuelle:minuteActuelle
 			minuteActuelle = minute;
 			heureActuelle = heure;
+			jourActuel = d7;
 			for (int i = 0; i < idSegments.GetTaille(); i++)
 			{
 				// Si le segment existe, on calcul le temps le plus probable de parcours :
@@ -199,8 +200,8 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 						heureActuelle %= 24;
 					}
 				}
-
-			}
+			} //----- Fin de for ( segment )
+			
 			// En cas de nouveau meilleur temps : mise a jour
 			if ( (temps < meilleurTemps || meilleurTemps == 0) && temps > 0 )
 			{
@@ -208,7 +209,7 @@ void Ville::TempsParcours ( int d7, int hDebut, int hFin, Vecteur<int>& idSegmen
 				meilleureHeure = heure;
 				meilleureMinute = minute;
 			}
-		}
+		} //----- Fin de for ( minute )
 	} //----- Fin de for ( heure ) ; recherche du meilleur temps
 
 	// Affichage
@@ -241,7 +242,7 @@ void Ville::AjouterEvenement( int id, Evenement& evenement )
     {
         capteur = new Capteur( id );
 		tableDeHachage.Inserer( capteur );
-		listeId.insererFin( id );							//on le crée
+		listeId.InsererFin( id );							//on le crée
         capteur = tableDeHachage.GetCapteur( id );			//on est donc sur qu'il existe maintenant
         capteur->Inserer( evenement );
     }

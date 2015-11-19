@@ -5,11 +5,9 @@
     copyright            : (C) 2015 par Pericas-Belletier
 *************************************************************************/
 
-//---------- Interface de la classe <Temps> (fichier ${file_name}) ------
+//---------- Interface de la classe <Temps> (fichier Temps.cpp) ------
 #if ! defined ( TEMPS_H )
 #define TEMPS_H
-
-//--------------------------------------------------- Interfaces utilisées
 
 //------------------------------------------------------------- Constantes
 const int MIN_PAR_HEURE = 60;
@@ -17,12 +15,12 @@ const int HEURE_PAR_JOUR = 24;
 const int JOUR_PAR_SEMAINE = 7;
 const int MIN_PAR_SEMAINE = JOUR_PAR_SEMAINE * HEURE_PAR_JOUR * MIN_PAR_HEURE;
 
-//------------------------------------------------------------------ Types
-
 //------------------------------------------------------------------------
 // Rôle de la classe <Temps>
-//
-//
+// La classe Temps représente une date. Elle contient un champs pour chaque décomposition d'une date
+// (année, mois, jour.... etc, etc) ainsi qu'un champ d7, de 1 à 7, qui indique le jour de la semaine à la date,
+// afin d’éviter d'avoir à le recalculer régulièrement. Il dispose du coup d'un constructeur qui prend
+// l'ensemble des champs en paramètre pour simplifier l'ajout d'un événement.
 //------------------------------------------------------------------------
 
 class Temps
@@ -37,63 +35,44 @@ public:
     // Contrat :
     //
 
-	int GetD7() const { return d7; }
-	// Donne le jour de la semaine
+	int GetD7( ) const { return d7; }
+	// Mode d'emploi :	Donne le jour de la semaine
 
-	int GetHeure() const { return heure; }
-	// Donne l'heure
+	int GetHeure( ) const { return heure; }
+	// Mode d'emploi :	Donne l'heure
 
-	int GetMinute() const { return minute;  }
-	// Donne la minute
+	int GetMinute( ) const { return minute;  }
+	// Mode d'emploi :	Donne la minute
 
 
 //------------------------------------------------- Surcharge d'opérateurs
     Temps & operator = ( const Temps & unTemps );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi :	Réaffecte l'instance courante pour la rendre en tout point similaire à unTemps.
 
     bool operator== ( const Temps & unTemps ) const;
-    //surcharge de comparaison
+	// Mode d'emploi :	Retourne true si les deux Evenements sont égaux (en termesde d7, année, mois, jour, minute, seconde),
+	//					false sinon.
 
     bool operator< ( const Temps & unTemps ) const;
-    //surcharge de comparaison
+	// Mode d'emploi : Retourne true si le Temps courant est antérieur à unTemps, false sinon.
 
 
 //-------------------------------------------- Constructeurs - destructeur
     Temps ( const Temps & unTemps );
-    // Mode d'emploi (constructeur de copie) :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi (constructeur de copie) :	Consruit une nouvelle instance de Temps à partir d'un Temps existant unTemps.
 
     Temps ( );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi :	Construit un Temps avec toutes ses valeurs à 0 et un D7 de 1
 
     Temps ( int und7, int uneAnnee, int unMois, int unJour, int uneHeure, int uneMinute );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi :	Construit un Temps avec initialisation des valeurs par l'utilisateurs
+	// Contrat :		Respecter le système d'unités pour les temps afin de donner une date cohérente.
 
 
     virtual ~Temps ( );
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+	// Mode d'emploi :	Detruit une instance de temps
 
 //------------------------------------------------------------------ PRIVE
-
-protected:
-//----------------------------------------------------- Méthodes protégées
-
-private:
-//------------------------------------------------------- Méthodes privées
 
 protected:
 //----------------------------------------------------- Attributs protégés
@@ -105,16 +84,7 @@ int heure;
 int minute;
 
 private:
-//------------------------------------------------------- Attributs privés
-
-//---------------------------------------------------------- Classes amies
-
-//-------------------------------------------------------- Classes privées
-
-//----------------------------------------------------------- Types privés
 
 };
-
-//----------------------------------------- Types dépendants de <Temps>
 
 #endif // TEMPS_H
